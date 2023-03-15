@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -8,10 +9,17 @@ using UnityEngine;
 public class GridManager : MonoBehaviour {
     public float offset = 0;
 
+    /*
+    public Camera mainCamera;
+    */
+
     public Transform Tile;
 
     public int gridWidth = 9;
     public int gridHeight = 9;
+
+
+
 
     float hexWidth = 1.732f;
     float hexHeight= 2.0f;
@@ -20,6 +28,16 @@ public class GridManager : MonoBehaviour {
     Vector3 startPos;
 
     void Start() {
+
+        // forsøg på at lave et adaptive camera. 
+        /*
+        float gridWidth1 = gridWidth * hexWidth;
+        float gridHeight1 = gridHeight * hexHeight;
+        float aspectRatio = gridWidth1 / gridHeight1;
+
+        mainCamera.orthographicSize = Mathf.Max(gridWidth1/2, gridHeight1/2) / aspectRatio;
+        */
+
         AddGap();
         CalcStartPos();
         CreateGrid();
@@ -50,7 +68,7 @@ public class GridManager : MonoBehaviour {
         float y = startPos.y - gridPos.y * hexHeight * 0.75f;
         
 
-        return new Vector3(x,y,0);
+        return new Vector2(x,y);
     }
 
     void CreateGrid() {
@@ -63,10 +81,18 @@ public class GridManager : MonoBehaviour {
                         Vector2 gridPos = new Vector2(x,y);
                         hex.position = CalcWorldPos(gridPos);
                         hex.parent = this.transform; 
-                        hex.name = "Hexagon" + x + "|" + y; 
+                        hex.name = "Hexagon" + x + "|" + y;
+                
+                hex.AddComponent<BoxCollider2D>();
+                hex.AddComponent<GPTColorChanger>();
+
+                //int counter = 0;
+
+                //  hex.AddComponent<GPTColorChanger>();
+                //    counter++;
 
 
-                }
+            }
             }
 
     }
