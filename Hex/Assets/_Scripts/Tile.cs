@@ -45,7 +45,7 @@ public class Tile : MonoBehaviour {
             //if (_renderer.color != Color.green && _renderer.color != Color.red)
                 if (_renderer.color == Color.white)
                 {
-                _renderer.color = Color.green;
+                _renderer.color = Color.blue;
                 colorDecidingCounter++;
             }
 

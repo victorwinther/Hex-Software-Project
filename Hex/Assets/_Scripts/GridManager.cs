@@ -14,6 +14,7 @@ public class GridManager : MonoBehaviour
     Vector3 startPos;
     private Dictionary<Vector2, Tile> _tiles;
     public List<Vector2> clickedTiles = new List<Vector2>();
+    [SerializeField] private Transform cam;
 
     /*
     public Camera mainCamera;
@@ -87,22 +88,17 @@ public class GridManager : MonoBehaviour
                 
                 hex.gameObject.AddComponent<BoxCollider2D>();
 
-                // Add event trigger to detect clicks
-                /*var eventTrigger = hex.gameObject.AddComponent<EventTrigger>();
-                var pointerDown = new EventTrigger.Entry();
-                pointerDown.eventID = EventTriggerType.PointerDown;
-                pointerDown.callback.AddListener((data) => { OnTileClick(hex); });
-                eventTrigger.triggers.Add(pointerDown);
-                //int counter = 0;
-                */
-
-                //  hex.AddComponent<GPTColorChanger>();
-                //    counter++;
-
-
+               
 
             }
         }
+        Debug.Log(gridWidth + " and "+ gridHeight);
+        // cam.transform.position = new Vector3((float) gridWidth - gridWidth/5, -(float)gridHeight / 2 + 0.8f, -10);
+        float camX = (gridWidth - 1) * hexWidth * 0.75f;
+        float camY = (gridHeight - 1) * hexHeight;
+        cam.position = new Vector3(camX / 2, -camY / 2, -10);
+        float camSize = Mathf.Max(camX, camY) / 2;
+        cam.GetComponent<Camera>().orthographicSize = camSize;
 
     }
   
