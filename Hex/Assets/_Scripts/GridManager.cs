@@ -10,12 +10,12 @@ public class GridManager : MonoBehaviour
 {
     public static GridManager Instance;
     public float offset = 0;
-
     Vector3 startPos;
     private Dictionary<Vector2, Tile> _tiles;
     public List<Vector2> clickedTiles = new List<Vector2>();
     [SerializeField] private Transform cam;
 
+    public Transform gameBoard;
     /*
     public Camera mainCamera;
     */
@@ -29,7 +29,7 @@ public class GridManager : MonoBehaviour
     float hexHeight = 2.0f;
     public float gap = 0.0f;
 
-  
+    public float tileSize; // Adjust the size of the tiles
 
     private void Awake()
     {
@@ -42,7 +42,7 @@ public class GridManager : MonoBehaviour
         hexWidth += hexWidth * gap;
         hexHeight += hexHeight * gap;
     }
-
+    
     public void CalcStartPos()
     {
         float offset = 0;
@@ -81,25 +81,28 @@ public class GridManager : MonoBehaviour
                 Transform hex = Instantiate(Tile) as Transform;
                 Vector2 gridPos = new Vector2(x, y);
                 hex.position = CalcWorldPos(gridPos);
-                hex.parent = this.transform;
+                //hex.parent = this.transform;
+                hex.parent = gameBoard;
                 hex.name = "Hexagon" + x + "|" + y;
 
-              //  hex.AddComponent<BoxCollider2D>();
-                
-                hex.gameObject.AddComponent<BoxCollider2D>();
+                //  hex.AddComponent<BoxCollider2D>();
 
-               
+               // hex.gameObject.AddComponent<BoxCollider2D>();
+
+                hex.localScale = new Vector3(tileSize, tileSize, 1.0f);
 
             }
+   
         }
-        Debug.Log(gridWidth + " and "+ gridHeight);
-        // cam.transform.position = new Vector3((float) gridWidth - gridWidth/5, -(float)gridHeight / 2 + 0.8f, -10);
-        float camX = (gridWidth - 1) * hexWidth * 0.75f;
-        float camY = (gridHeight - 1) * hexHeight;
-        cam.position = new Vector3(camX / 2, -camY / 2, -10);
-        float camSize = Mathf.Max(camX, camY) / 2;
-        cam.GetComponent<Camera>().orthographicSize = camSize;
 
+    
+        // Set the camera position to the calculated position
+        cam.position = new Vector3(7.85f, -4.35f, -1.0f); ;
+
+        // Set the camera's orthographic size based on the required size
+        cam.GetComponent<Camera>().orthographicSize = 5.77622f;
+
+  
     }
   
 
