@@ -15,6 +15,8 @@ public class GridManager : MonoBehaviour
     public List<Vector2> clickedTiles = new List<Vector2>();
     [SerializeField] private Transform cam;
 
+    public GameObject hexPrefab;
+
     public Transform gameBoard;
     /*
     public Camera mainCamera;
@@ -22,14 +24,13 @@ public class GridManager : MonoBehaviour
 
     public Transform Tile;
 
-    public int gridWidth = 3;
-    public int gridHeight = 3;
+    public int gridSize = 3;
+    public float tileSize; // Adjust the size of the tiles
 
-    float hexWidth = 1.732f;
-    float hexHeight = 2.0f;
+    float hexSize = 2.0f;
     public float gap = 0.0f;
 
-    public float tileSize; // Adjust the size of the tiles
+  
 
     private void Awake()
     {
@@ -39,44 +40,67 @@ public class GridManager : MonoBehaviour
     
     public void AddGap()
     {
-        hexWidth += hexWidth * gap;
-        hexHeight += hexHeight * gap;
+        hexSize = (11 / gridSize) * hexSize;
+        gap = 1.0f;
+        hexSize += 0;
+       
     }
-    
+    /*
+    public void CalcStartPos()
+    {
+        
+        float offset = 0;
+        if (gridSize / 2 % 2 != 0)
+        {
+            offset = hexSize / 2;
+        }
+
+        float x = -hexSize * (gridSize / 2) - offset;
+        float y = hexSize * 0.75f * (gridSize / 2);
+    }
+    */
     public void CalcStartPos()
     {
         float offset = 0;
-        if (gridHeight / 2 % 2 != 0)
+        if (gridSize / 2 % 2 != 0)
         {
-            offset = hexWidth / 2;
+            offset = hexSize / 2;
         }
-
-        float x = -hexWidth * (gridWidth / 2) - offset;
-        float y = hexHeight * 0.75f * (gridHeight / 2);
+        startPos.x = 0;
+        startPos.y = 0;
+        /*
+        startPos.x = -hexSize * (gridSize / 2) - offset;
+        startPos.y = hexSize * 0.5f * (gridSize / 2);
+        */
     }
-
     public Vector3 CalcWorldPos(Vector2 gridPos)
     {
 
         //if(gridPos.y % 2 != 0) 
         //offset += (hexWidth/2); 
+        float xSpacing = hexSize * 0.45f; // Adjust the spacing between tiles horizontally
+        float ySpacing = hexSize * 0.45f; // Adjust the spacing between tiles vertically
 
-        float x = startPos.x + gridPos.x * hexWidth + offset;
-        float y = startPos.y - gridPos.y * hexHeight * 0.75f;
+        float x = startPos.x + gridPos.x * xSpacing;
+        float y = startPos.y - gridPos.y * ySpacing;
+
+        //float x = startPos.x + gridPos.x * hexSize + offset;
+        //float y = startPos.y - gridPos.y * hexSize * 0.75f;
 
 
         return new Vector2(x, y);
     }
-
+    /*
     public void CreateGrid()
     {
-        _tiles = new Dictionary<Vector2, Tile>();
+        tileSize = (11/ gridSize);
+         _tiles = new Dictionary<Vector2, Tile>();
         startPos = Vector3.zero; // Initialize startPos to Vector3.zero
-        for (int y = 0; y < gridHeight; y++)
+        for (int y = 0; y < gridSize; y++)
         {
             // the line below shapes the board like a paralelogram.
-            startPos.x += hexWidth / 2;
-            for (int x = 0; x < gridWidth; x++)
+            startPos.x += hexSize / 4;
+            for (int x = 0; x < gridSize; x++)
             {
                 Transform hex = Instantiate(Tile) as Transform;
                 Vector2 gridPos = new Vector2(x, y);
@@ -94,7 +118,9 @@ public class GridManager : MonoBehaviour
             }
    
         }
+   
 
+    }
     
         // Set the camera position to the calculated position
         cam.position = new Vector3(7.85f, -4.35f, -1.0f); ;
@@ -104,9 +130,26 @@ public class GridManager : MonoBehaviour
 
   
     }
-  
+   */
+    
+    public void CreateGrid()
+    {
+        float offRoxXOffset = 0.9f;
+        float yOffset = 0.77f;
+        for (int x = 0; x < gridSize; x++)
+        {
+            for (int y = 0; y < gridSize; y++)
+            {
+                float xPos = x*offRoxXOffset + (y*offRoxXOffset)/2;
 
-    public Tile GetTileAtPostion(Vector2 pos)
+                GameObject hex = Instantiate(hexPrefab, new Vector2(xPos, -y * yOffset), Quaternion.identity);
+            }
+
+        }
+        
+    }
+
+        public Tile GetTileAtPostion(Vector2 pos)
     {
         if(_tiles.TryGetValue(pos,out var tile))
         {
