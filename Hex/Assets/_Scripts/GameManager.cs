@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -39,6 +40,13 @@ public class GameManager : MonoBehaviour
                 break;
            
         }
+    }
+
+    public int EndScene;
+
+    public void EndGame()
+    {
+        SceneManager.LoadScene(EndScene);
     }
 }
 public enum GameState
