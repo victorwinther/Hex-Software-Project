@@ -24,13 +24,7 @@ public class GridManager : MonoBehaviour
 
     public Transform Tile;
 
-    public int gridSize = 3;
-    public float tileSize; // Adjust the size of the tiles
-
-    float hexSize = 2.0f;
-    public float gap = 0.0f;
-
-  
+    public int gridSize;
 
     private void Awake()
     {
@@ -38,58 +32,7 @@ public class GridManager : MonoBehaviour
     }
 
     
-    public void AddGap()
-    {
-        hexSize = (11 / gridSize) * hexSize;
-        gap = 1.0f;
-        hexSize += 0;
-       
-    }
-    /*
-    public void CalcStartPos()
-    {
-        
-        float offset = 0;
-        if (gridSize / 2 % 2 != 0)
-        {
-            offset = hexSize / 2;
-        }
 
-        float x = -hexSize * (gridSize / 2) - offset;
-        float y = hexSize * 0.75f * (gridSize / 2);
-    }
-    */
-    public void CalcStartPos()
-    {
-        float offset = 0;
-        if (gridSize / 2 % 2 != 0)
-        {
-            offset = hexSize / 2;
-        }
-        startPos.x = 0;
-        startPos.y = 0;
-        /*
-        startPos.x = -hexSize * (gridSize / 2) - offset;
-        startPos.y = hexSize * 0.5f * (gridSize / 2);
-        */
-    }
-    public Vector3 CalcWorldPos(Vector2 gridPos)
-    {
-
-        //if(gridPos.y % 2 != 0) 
-        //offset += (hexWidth/2); 
-        float xSpacing = hexSize * 0.45f; // Adjust the spacing between tiles horizontally
-        float ySpacing = hexSize * 0.45f; // Adjust the spacing between tiles vertically
-
-        float x = startPos.x + gridPos.x * xSpacing;
-        float y = startPos.y - gridPos.y * ySpacing;
-
-        //float x = startPos.x + gridPos.x * hexSize + offset;
-        //float y = startPos.y - gridPos.y * hexSize * 0.75f;
-
-
-        return new Vector2(x, y);
-    }
     /*
     public void CreateGrid()
     {
@@ -134,6 +77,7 @@ public class GridManager : MonoBehaviour
     
     public void CreateGrid()
     {
+
         float offRoxXOffset = 0.9f;
         float yOffset = 0.77f;
         for (int x = 0; x < gridSize; x++)
@@ -141,8 +85,13 @@ public class GridManager : MonoBehaviour
             for (int y = 0; y < gridSize; y++)
             {
                 float xPos = x*offRoxXOffset + (y*offRoxXOffset)/2;
+                Transform hex = Instantiate(Tile) as Transform;
+                hex.position = new Vector2(xPos, -y * yOffset);
+                hex.name = "Hexagon" + x + "|" + y;
+                hex.gameObject.AddComponent<BoxCollider2D>();
+                //GameObject hex = Instantiate(hexPrefab, new Vector2(xPos, -y * yOffset), Quaternion.identity);
+                // hex.transform.localScale = new Vector3(tileSize, tileSize, 1.0f);
 
-                GameObject hex = Instantiate(hexPrefab, new Vector2(xPos, -y * yOffset), Quaternion.identity);
             }
 
         }

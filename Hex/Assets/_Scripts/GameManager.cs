@@ -26,8 +26,6 @@ public class GameManager : MonoBehaviour
         switch (newState)
         {
             case GameState.GenerateGrid:
-                GridManager.Instance.AddGap();
-                GridManager.Instance.CalcStartPos();
                 GridManager.Instance.CreateGrid();
                 break;
             case GameState.PlayerTurn:
