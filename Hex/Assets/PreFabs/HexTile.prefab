@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5136063694282367206}
+  - component: {fileID: 2350811796207170219}
   m_Layer: 0
   m_Name: HexTile
   m_TagString: Untagged
@@ -32,6 +33,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2350811796207170219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174097942624654790}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 626583c1012164b10955e9ff9a2c205f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _baseColor: {r: 1, g: 1, b: 1, a: 1}
+  _renderer: {fileID: 7225826850896504669}
+  _highlight: {fileID: 1488338523142436400}
+  _owner: 0
 --- !u!1001 &2691100127201451332
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -89,8 +106,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 431b033b1ba004c2ab24496c3fa8b202, type: 3}
+--- !u!1 &1488338523142436400 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3602617256069491572, guid: 431b033b1ba004c2ab24496c3fa8b202, type: 3}
+  m_PrefabInstance: {fileID: 2691100127201451332}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &2724965514418128363 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 38756669945862319, guid: 431b033b1ba004c2ab24496c3fa8b202, type: 3}
+  m_PrefabInstance: {fileID: 2691100127201451332}
+  m_PrefabAsset: {fileID: 0}
+--- !u!212 &7225826850896504669 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4692749103949658649, guid: 431b033b1ba004c2ab24496c3fa8b202, type: 3}
   m_PrefabInstance: {fileID: 2691100127201451332}
   m_PrefabAsset: {fileID: 0}

@@ -54,7 +54,10 @@ public class GameManager : MonoBehaviour
 
         Vector2 chosenMove;
 
-        if (GridManager.Instance.gridWidth == 3 && GridManager.Instance.gridHeight == 3)
+
+
+
+        if (GridManager.Instance.gridSize == 3)
         {
             // Specific strategy for 3x3 grid
             if (opponentMoves.Count == 0)
@@ -106,7 +109,7 @@ public class GameManager : MonoBehaviour
                 chosenMove = GetRandomAvailableTile();
             }
         }
-        else if (GridManager.Instance.gridWidth == 2 && GridManager.Instance.gridHeight == 2)
+        else if (GridManager.Instance.gridSize == 2)
         {
             // Specific strategy for 2x2 grid
             if (aiMoves.Count == 0)
@@ -139,6 +142,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Make the chosen move
+
         GridManager.Instance.tiles[(int)chosenMove.x, (int)chosenMove.y].Owner = CurrentPlayer;
         GridManager.Instance.tiles[(int)chosenMove.x, (int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.blue : Color.red;
 
@@ -195,8 +199,6 @@ public class GameManager : MonoBehaviour
         switch (newState)
         {
             case GameState.GenerateGrid:
-                GridManager.Instance.AddGap();
-                GridManager.Instance.CalcStartPos();
                 GridManager.Instance.CreateGrid();
                 if (CurrentPlayer == 2) // if AI is the first player, make the first move
                 {
