@@ -26,7 +26,7 @@ public class GridManager : MonoBehaviour
 
     public Transform Tile;
 
-    public Tile[,] tiles;
+    public Tile[][] tiles;
     public int gridSize = 3;
 
     public float tileSize; // Adjust the size of the tiles
@@ -35,16 +35,28 @@ public class GridManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
   
     
     public void CreateGrid()
     {
-        tiles = new Tile[gridSize, gridSize];
+        tiles = new Tile[gridSize][];
+        for (int i = 0; i < gridSize; i++)
+        {
+            tiles[i] = new Tile[gridSize];
+        }
         float offRoxXOffset = 0.9f;
         float yOffset = 0.77f;
+        
         for (int x = 0; x < gridSize; x++)
         {
             for (int y = 0; y < gridSize; y++)
@@ -54,17 +66,10 @@ public class GridManager : MonoBehaviour
                 hex.position = new Vector2(xPos, -y * yOffset);
                 hex.name = "Hexagon" + x + "|" + y;
                 hex.gameObject.AddComponent<BoxCollider2D>();
-                //GameObject hex = Instantiate(hexPrefab, new Vector2(xPos, -y * yOffset), Quaternion.identity);
-                // hex.transform.localScale = new Vector3(tileSize, tileSize, 1.0f);
-
-                Transform hex = Instantiate(Tile) as Transform;
-                hex.position = new Vector2(xPos, -y * yOffset);
-                hex.name = "Hexagon" + x + "|" + y;
-                hex.gameObject.AddComponent<BoxCollider2D>();
 
                 Tile tileScript = hex.gameObject.GetComponent<Tile>();
-                
-                tiles[x, y] = tileScript;
+
+                tiles[x][y] = tileScript;
             }
 
         }
@@ -78,7 +83,7 @@ public class GridManager : MonoBehaviour
 
         if (x >= 0 && x < gridSize && y >= 0 && y < gridSize)
         {
-            return tiles[x, y];
+            return tiles[x][y];
         }
         return null;
     }
@@ -90,11 +95,11 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < gridSize; x++)
             {
-                if (tiles[x, y].Owner == 0)
+                if (tiles[x][y].Owner == 0)
                     boardState += "0 "; // Unclaimed
-                else if (tiles[x, y].Owner == 1)
+                else if (tiles[x][ y].Owner == 1)
                     boardState += "1 "; // Player 1
-                else if (tiles[x, y].Owner == 2)
+                else if (tiles[x][ y].Owner == 2)
                     boardState += "2 "; // Player 2
             }
             boardState += "\n";

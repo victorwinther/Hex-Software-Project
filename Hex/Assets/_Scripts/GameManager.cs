@@ -18,7 +18,14 @@ public class GameManager : MonoBehaviour
 
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void SwitchPlayer()
@@ -54,9 +61,6 @@ public class GameManager : MonoBehaviour
 
         Vector2 chosenMove;
 
-
-
-
         if (GridManager.Instance.gridSize == 3)
         {
             // Specific strategy for 3x3 grid
@@ -68,26 +72,26 @@ public class GameManager : MonoBehaviour
             {
                 if (opponentMoves[0].y == 0) // Top row
                 {
-                    chosenMove = GridManager.Instance.tiles[1, 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
+                    chosenMove = GridManager.Instance.tiles[1][0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
                 }
                 else if (opponentMoves[0].y == 1) // Middle row
                 {
                     if (secondMove.y == 0) // If AI's second move was in the top row
                     {
-                        chosenMove = GridManager.Instance.tiles[0, 2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
+                        chosenMove = GridManager.Instance.tiles[0][ 2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
                     }
                     else if (secondMove.y == 2) // If AI's second move was in the bottom row
                     {
-                        chosenMove = GridManager.Instance.tiles[1, 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
+                        chosenMove = GridManager.Instance.tiles[1][ 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
                     }
                     else
                     {
-                        chosenMove = GridManager.Instance.tiles[1, 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
+                        chosenMove = GridManager.Instance.tiles[1][ 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
                     }
                 }
                 else // opponentMoves[0].y == 2 Bottom row
                 {
-                    chosenMove = GridManager.Instance.tiles[0, 2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
+                    chosenMove = GridManager.Instance.tiles[0][ 2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
                 }
                 secondMove = chosenMove; // Record the second move of AI
             }
@@ -95,16 +99,16 @@ public class GameManager : MonoBehaviour
             {
                 if (opponentMoves[0].y == 0) // Top row
                 {
-                    chosenMove = GridManager.Instance.tiles[0, 2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
+                    chosenMove = GridManager.Instance.tiles[0][ 2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
                 }
                 else // opponentMoves[0].y == 2 Bottom row
                 {
-                    chosenMove = GridManager.Instance.tiles[1, 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
+                    chosenMove = GridManager.Instance.tiles[1][ 0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
                 }
             }
 
             // If the chosen tile is not available, switch to the default random strategy
-            if (GridManager.Instance.tiles[(int)chosenMove.x, (int)chosenMove.y].Owner != 0)
+            if (GridManager.Instance.tiles[(int)chosenMove.x][ (int)chosenMove.y].Owner != 0)
             {
                 chosenMove = GetRandomAvailableTile();
             }
@@ -120,11 +124,11 @@ public class GameManager : MonoBehaviour
             else
             {
                 // pick either (0,1) or (1,1) depending on which one is available
-                if (GridManager.Instance.tiles[0, 1].Owner == 0)
+                if (GridManager.Instance.tiles[0][ 1].Owner == 0)
                 {
                     chosenMove = new Vector2(0, 1);
                 }
-                else if (GridManager.Instance.tiles[1, 1].Owner == 0)
+                else if (GridManager.Instance.tiles[1][ 1].Owner == 0)
                 {
                     chosenMove = new Vector2(1, 1);
                 }
@@ -143,11 +147,21 @@ public class GameManager : MonoBehaviour
 
         // Make the chosen move
 
-        GridManager.Instance.tiles[(int)chosenMove.x, (int)chosenMove.y].Owner = CurrentPlayer;
-        GridManager.Instance.tiles[(int)chosenMove.x, (int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.blue : Color.red;
+        GridManager.Instance.tiles[(int)chosenMove.x][ (int)chosenMove.y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[(int)chosenMove.x][ (int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.blue : Color.red;
 
         // Record AI's move
         aiMoves.Add(chosenMove);
+
+        GameUtils gameUtils = new GameUtils();
+        int winner = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
+
+        if (winner != 0)
+        {
+            Debug.Log("Player " + winner + " wins!");
+            EndGame();
+        }
+       
 
         // Log AI's move
         Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
@@ -160,15 +174,15 @@ public class GameManager : MonoBehaviour
     // Method to get a random available tile
     private Vector2 GetRandomAvailableTile()
     {
-        Tile[,] tiles = GridManager.Instance.tiles;
+        Tile[][] tiles = GridManager.Instance.tiles;
         List<(Tile tile, Vector2 pos)> availableTiles = new List<(Tile tile, Vector2 pos)>();
-        for (int x = 0; x < tiles.GetLength(0); x++)
+        for (int x = 0; x < tiles.Length; x++)
         {
-            for (int y = 0; y < tiles.GetLength(1); y++)
+            for (int y = 0; y < tiles[x].Length; y++)
             {
-                if (tiles[x, y].Owner == 0) // tile is unclaimed
+                if (tiles[x][ y].Owner == 0) // tile is unclaimed
                 {
-                    availableTiles.Add((tiles[x, y], new Vector2(x, y)));
+                    availableTiles.Add((tiles[x][ y], new Vector2(x, y)));
                 }
             }
         }

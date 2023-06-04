@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,6 +35,7 @@ public class Tile : MonoBehaviour
 
     private void OnMouseDown()
     {
+        
         if (Owner == 0)
         {
             Owner = GameManager.CurrentPlayer;
@@ -42,7 +44,10 @@ public class Tile : MonoBehaviour
 
             // Update the color of the tile based on the owner
             _renderer.color = Owner == 1 ? Color.blue : Color.red;
+
+            
         }
+   
 
         // Extract the x and y index from the GameObject's name
         int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
@@ -50,6 +55,15 @@ public class Tile : MonoBehaviour
 
         Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
+        GameUtils gameUtils = new GameUtils();
+        int winner = gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
+
+        if (winner != 0)
+        {
+            Debug.Log("Player " + winner + " wins!");
+            GameManager.Instance.EndGame();
+        }
+      
         GridManager.Instance.PrintBoardState();
     }
 }
