@@ -9,9 +9,10 @@ public class sc : MonoBehaviour
 
     void Start()
     {
+        boardHeight = MainMenuManager.gridSize;
         // The number of points for the line renderer
         // is the height times 2 plus 1 for the starting point
-        boardHeight = GridManager.Instance.gridSize;
+        //boardHeight = GridManager.Instance.gridSize;
         line.positionCount = boardHeight * 2 + 1;
         List<Vector3> points = new List<Vector3>();
         

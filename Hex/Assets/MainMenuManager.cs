@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 using TMPro;
 
 public class MainMenuManager : MonoBehaviour
@@ -9,6 +10,23 @@ public class MainMenuManager : MonoBehaviour
     public int gameStartScene;
     public TMP_InputField player1NameInput;
     public TMP_InputField player2NameInput;
+
+    public InputField inputField;
+    public Text output;
+    public GridManager gridManager;
+    public static int gridSize;
+
+public void NumberOfTiles(string value)
+{
+    output.text = inputField.text;
+
+    if (int.TryParse(inputField.text, out int newGridSize))
+    {
+        gridSize = newGridSize;
+        Debug.Log("Grid:" + gridSize);
+        Debug.Log("Grid:" + gridSize);
+    }
+}
 
     public void StartGame()
     {

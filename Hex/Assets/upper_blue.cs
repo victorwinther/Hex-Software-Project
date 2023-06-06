@@ -9,8 +9,8 @@ public class upper_blue : MonoBehaviour
 
     void Start()
     {
-
-        boardHeight = GridManager.Instance.gridSize;
+        boardHeight = MainMenuManager.gridSize;
+        //boardHeight = GridManager.Instance.gridSize;
         // The number of points for the line renderer is the height times 2 plus 1 for the starting point
         line.positionCount = boardHeight * 2 + 1;
         List<Vector3> points = new List<Vector3>();
