@@ -7,6 +7,8 @@ public class upper_blue : MonoBehaviour
     public LineRenderer line;
     public int boardHeight; // Set this to your actual board height
 
+    //comment
+
     void Start()
     {
         boardHeight = MainMenuManager.gridSize;
