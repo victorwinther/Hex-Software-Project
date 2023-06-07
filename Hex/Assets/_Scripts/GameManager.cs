@@ -207,7 +207,9 @@ public class GameManager : MonoBehaviour
         if (winner != 0)
         {
             Debug.Log("Player " + winner + " wins!");
-           
+
+            Tile.SetClickable();
+
         }
 
         // Log AI's move

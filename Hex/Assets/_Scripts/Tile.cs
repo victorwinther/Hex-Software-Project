@@ -10,11 +10,11 @@
         [SerializeField] private GameObject _highlight;
         [SerializeField] private int _owner = 0;
 
-        private static bool clickable = true;
+        public static bool clickable = true;
 
-        public void SetClickable(bool value)
+        public static void SetClickable()
         {
-            clickable = value;
+            clickable = false;
         }
 
     public int Owner
