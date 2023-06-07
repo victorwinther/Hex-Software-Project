@@ -138,12 +138,15 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1); // wait for 1 second before AI makes move
 
         Vector2 chosenMove;
+        Debug.Log(MainMenuManager.gridSize);
 
-        if (GridManager.Instance.gridSize == 3)
+        if (MainMenuManager.gridSize == 3)
         {
+           
             // Specific strategy for 3x3 grid
             if (opponentMoves.Count == 0)
             {
+                Debug.Log("true");
                 chosenMove = new Vector2(1, 1); // Center position
             }
             else if (opponentMoves.Count == 1)
@@ -191,7 +194,7 @@ public class GameManager : MonoBehaviour
                 chosenMove = GetRandomAvailableTile();
             }
         }
-        else if (GridManager.Instance.gridSize == 2)
+        else if (MainMenuManager.gridSize == 2)
         {
             // Specific strategy for 2x2 grid
             if (aiMoves.Count == 0)
@@ -253,7 +256,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
         SwitchPlayer();
     }
-    
+
 
 
 
@@ -267,15 +270,14 @@ public class GameManager : MonoBehaviour
         List<Vector2> priorityTiles = new List<Vector2>();
 
         // Calculate the center of the grid
-        float centerX = GridManager.Instance.gridSize / 2;
-        float centerY = GridManager.Instance.gridSize / 2;
+        float centerX = MainMenuManager.gridSize / 2;
+        float centerY = MainMenuManager.gridSize / 2;
 
         // Iterate through all the tiles
-        for (int x = 0; x < GridManager.Instance.gridSize; x++)
+        for (int x = 0; x < MainMenuManager.gridSize; x++)
         {
-            for (int y = 0; y < GridManager.Instance.gridSize; y++)
+            for (int y = 0; y < MainMenuManager.gridSize; y++)
             {
-
                 // If this tile is not owned yet
                 if (GridManager.Instance.tiles[x][y].Owner == 0)
                 {
@@ -288,11 +290,6 @@ public class GameManager : MonoBehaviour
                     {
                         availableTiles.Add(new Vector2(x, y));
                     }
-
-                if (tiles[x][y].Owner == 0) // tile is unclaimed
-                {
-                    availableTiles.Add((tiles[x][y], new Vector2(x, y)));
-
                 }
             }
         }
@@ -373,189 +370,6 @@ public class GameManager : MonoBehaviour
 
 
 
-/*
-public class MCTSNode
-{
-    public Tile[][] GameState;
-    public List<MCTSNode> Children;
-    public MCTSNode Parent;
-    public int Wins;
-    public int Visits;
-    public int PlayerJustMoved;
-    public Vector2Int MoveMade; // The move that led to this game state
-
-    public MCTSNode()
-    {
-        this.Children = new List<MCTSNode>();
-    }
-}
-
-public class MonteCarloTreeSearch
-{
-    private int _winScore = 1;
-    private int _numberOfSimulations = 100; // Increase or decrease based on your needs and performance
-    private System.Random _random = new System.Random();
-
-    public Vector2Int FindNextMove(Tile[][] gameState, int playerJustMoved)
-    {
-        MCTSNode rootNode = new MCTSNode { GameState = gameState, PlayerJustMoved = playerJustMoved };
-
-        for (int i = 0; i < _numberOfSimulations; ++i)
-        {
-            MCTSNode promisingNode = SelectPromisingNode(rootNode);
-            if (CheckWin(promisingNode.GameState, promisingNode.PlayerJustMoved) == 0)
-            {
-                // If the game is not over, expand the node
-                ExpandNode(promisingNode);
-            }
-
-            MCTSNode nodeToExplore = promisingNode;
-            if (promisingNode.Children.Count > 0)
-            {
-                nodeToExplore = promisingNode.Children[_random.Next(promisingNode.Children.Count)];
-            }
-
-            int playoutResult = SimulateRandomPlayout(nodeToExplore);
-            BackPropagate(nodeToExplore, playoutResult);
-        }
-
-        MCTSNode winnerNode = rootNode.Children[0];
-        foreach (MCTSNode childNode in rootNode.Children)
-        {
-            if (childNode.Visits > winnerNode.Visits)
-            {
-                winnerNode = childNode;
-            }
-        }
-
-        // Return the move that led to the winning node
-        return winnerNode.MoveMade;
-    }
-
-    private MCTSNode SelectPromisingNode(MCTSNode rootNode)
-    {
-        MCTSNode node = rootNode;
-        while (node.Children.Count != 0)
-        {
-            node = FindBestNodeWithUCT(node);
-        }
-        return node;
-    }
-
-    private void ExpandNode(MCTSNode node)
-    {
-        List<Vector2Int> possibleStates = GetPossibleMoves(node.GameState);
-        foreach (Vector2Int move in possibleStates)
-        {
-            MCTSNode child = new MCTSNode()
-            {
-                GameState = MakeMove(node.GameState, move, node.PlayerJustMoved % 2 + 1),
-                Parent = node,
-                PlayerJustMoved = node.PlayerJustMoved % 2 + 1,
-                MoveMade = move
-            };
-            node.Children.Add(child);
-        }
-    }
-
-    private void BackPropagate(MCTSNode nodeToExplore, int playerNo)
-    {
-        MCTSNode tempNode = nodeToExplore;
-        while (tempNode != null)
-        {
-            tempNode.Visits++;
-            if (tempNode.PlayerJustMoved == playerNo)
-            {
-                tempNode.Wins += _winScore;
-            }
-            tempNode = tempNode.Parent;
-        }
-    }
-
-    private int SimulateRandomPlayout(MCTSNode node)
-    {
-        MCTSNode tempNode = new MCTSNode { GameState = node.GameState, PlayerJustMoved = node.PlayerJustMoved };
-        int boardStatus = CheckWin(tempNode.GameState, tempNode.PlayerJustMoved);
-
-        if (boardStatus == tempNode.PlayerJustMoved)
-        {
-            tempNode.Parent.Wins += _winScore;
-            return boardStatus;
-        }
-
-        while (boardStatus == 0)
-        {
-            List<Vector2Int> availablePositions = GetPossibleMoves(tempNode.GameState);
-            tempNode.GameState = MakeMove(tempNode.GameState, availablePositions[_random.Next(availablePositions.Count)], tempNode.PlayerJustMoved % 2 + 1);
-            tempNode.PlayerJustMoved = tempNode.PlayerJustMoved % 2 + 1;
-            boardStatus = CheckWin(tempNode.GameState, tempNode.PlayerJustMoved);
-        }
-
-        return boardStatus;
-    }
-
-    private MCTSNode FindBestNodeWithUCT(MCTSNode node)
-    {
-        int parentVisit = node.Visits;
-        return node.Children.OrderByDescending(n => n.Wins / (double)n.Visits + Math.Sqrt(2 * Math.Log(parentVisit) / (double)n.Visits)).First();
-    }
-
-    private int CheckWin(Tile[][] gameState, int playerJustMoved)
-    {
-        GameUtils gameUtils = new GameUtils();
-        return gameUtils.CheckWin(gameState, playerJustMoved);
-    }
-
-    private List<Vector2Int> GetPossibleMoves(Tile[][] gameState)
-    {
-        // Implement a function here to get all possible moves for a given game state
-        // A possible move would be any unoccupied tile
-
-        // List of all available tiles, prioritized by their proximity to the center
-        List<Vector2Int> availableTiles = new List<Vector2Int>();
-
-        // Iterate through all the tiles
-        for (int x = 0; x < GridManager.Instance.gridSize; x++)
-        {
-            for (int y = 0; y < GridManager.Instance.gridSize; y++)
-            {
-                // If this tile is not owned yet
-                if (GridManager.Instance.tiles[x][y].Owner == 0)
-                {
-
-                    availableTiles.Add(new Vector2Int(x, y));
-
-                }
-            }
-        }
-        return availableTiles;
-    }
-
-    private Tile[][] MakeMove(Tile[][] gameState, Vector2Int move, int player)
-    {
-        // Create a new gameState to not mutate the original one
-        Tile[][] newGameState = new Tile[gameState.Length][];
-        for (int i = 0; i < gameState.Length; i++)
-        {
-            newGameState[i] = new Tile[gameState[i].Length];
-            for (int j = 0; j < gameState[i].Length; j++)
-            {
-                newGameState[i][j] = new Tile();
-                newGameState[i][j].Owner = gameState[i][j].Owner;
-                // Copy any other properties of the Tile class if necessary
-            }
-        }
-
-        // Make the move on the new game state
-        newGameState[(int)move.x][(int)move.y].Owner = player;
-        // newGameState[(int)move.x][(int)move.y].GetComponent<SpriteRenderer>().color = player == 1 ? Color.blue : Color.red;
-
-        return newGameState;
-    }
-
-
-}
-*/
 
 
 
