@@ -47,7 +47,14 @@
 
   
     
-        public void CreateGrid()
+
+    public void CreateGrid()
+    {
+        int gridSize = MainMenuManager.gridSize;
+        
+        tiles = new Tile[gridSize][];
+        for (int i = 0; i < gridSize; i++)
+
         {
             tiles = new Tile[gridSize][];
             for (int i = 0; i < gridSize; i++)
@@ -110,3 +117,4 @@
 
 
     }
+    

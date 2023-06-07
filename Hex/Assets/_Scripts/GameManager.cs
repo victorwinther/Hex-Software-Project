@@ -232,6 +232,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Make the chosen move
+
         GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
         GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.blue : Color.red;
 
@@ -246,6 +247,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Player " + winner + " wins!");
             EndGame();
         }
+
 
         // Log AI's move
         Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
@@ -273,6 +275,7 @@ public class GameManager : MonoBehaviour
         {
             for (int y = 0; y < GridManager.Instance.gridSize; y++)
             {
+
                 // If this tile is not owned yet
                 if (GridManager.Instance.tiles[x][y].Owner == 0)
                 {
@@ -285,6 +288,11 @@ public class GameManager : MonoBehaviour
                     {
                         availableTiles.Add(new Vector2(x, y));
                     }
+
+                if (tiles[x][y].Owner == 0) // tile is unclaimed
+                {
+                    availableTiles.Add((tiles[x][y], new Vector2(x, y)));
+
                 }
             }
         }
@@ -346,9 +354,12 @@ public class GameManager : MonoBehaviour
 
     public void EndGame()
     {
+        string winningPlayerName = PlayerPrefs.GetString("Player" + CurrentPlayer + "Name", "Player " + CurrentPlayer);
+        PlayerPrefs.SetString("WinningPlayerName", winningPlayerName);
         SceneManager.LoadScene(EndScene);
     }
 }
+
 
 
 
