@@ -8,10 +8,6 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    /*
-    private MonteCarloTreeSearch aiMCTS;
-    */
-
 
     GameUtils gameUtils = new GameUtils();
 
@@ -21,10 +17,10 @@ public class GameManager : MonoBehaviour
 
     public enum PlayerType { Human, AI }
 
-    public PlayerType Player1Type = PlayerType.Human;
-    public PlayerType Player2Type = PlayerType.AI;
+    public PlayerType Player1Type;
+    public PlayerType Player2Type;
 
-    public static int CurrentPlayer { get; private set; } = 2; // Start with AI
+    public static int CurrentPlayer;
 
     private void Awake()
     {
@@ -36,12 +32,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        /*
-        // Initialize the aiMCTS field
-        aiMCTS = new MonteCarloTreeSearch();
-        */
     }
-
 
     // Method to attempt blocking the opponent
     private Vector2? TryBlockOpponentMove()
@@ -70,8 +61,6 @@ public class GameManager : MonoBehaviour
         return null; // No blocking move found
     }
 
-
-
     public void SwitchPlayer()
     {
         CurrentPlayer = CurrentPlayer == 1 ? 2 : 1;
@@ -94,43 +83,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
     private List<Vector2> opponentMoves = new List<Vector2>();
     private List<Vector2> aiMoves = new List<Vector2>();
 
-
-    /*
-    private IEnumerator AIMove()
+    public void StopCorutine()
     {
-        yield return new WaitForSeconds(1); // wait for 1 second before AI makes move
-
-        Tile[][] currentGameState = GridManager.Instance.tiles;
-
-        // Find the next move using Monte Carlo Tree Search
-        Vector2Int chosenMove = aiMCTS.FindNextMove(currentGameState, CurrentPlayer);
-
-        // Make the chosen move
-        GridManager.Instance.tiles[chosenMove.x][chosenMove.y].Owner = CurrentPlayer;
-
-        // Log AI's move
-        Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
-
-        // Update the color of the tile based on the owner
-        GridManager.Instance.tiles[chosenMove.x][chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.blue : Color.red;
-
-        GameUtils gameUtils = new GameUtils();
-        int winner = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
-
-        if (winner != 0)
-        {
-            Debug.Log("Player " + winner + " wins!");
-            EndGame();
-        }
-
-        SwitchPlayer();
+        StopAllCoroutines();
     }
-    */
-
     
     private Vector2 secondMove;
     private IEnumerator AIMove()
@@ -237,7 +196,7 @@ public class GameManager : MonoBehaviour
         // Make the chosen move
 
         GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
-        GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.blue : Color.red;
+        GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
 
         // Record AI's move
         aiMoves.Add(chosenMove);
@@ -248,19 +207,13 @@ public class GameManager : MonoBehaviour
         if (winner != 0)
         {
             Debug.Log("Player " + winner + " wins!");
-            EndGame();
+           
         }
-
 
         // Log AI's move
         Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
         SwitchPlayer();
     }
-
-
-
-
-
 
     // Method to get a random available tile
     private Vector2 GetRandomAvailableTile()
@@ -306,17 +259,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
-
     // Record the opponent's move after every player action
     public void RecordOpponentMove(int x, int y)
     {
-        if (CurrentPlayer == 1)
+        if (GetPlayerType() == PlayerType.Human)
         {
             opponentMoves.Add(new Vector2(x, y));
         }
     }
-
 
     // Start is called before the first frame update
     void Start()
@@ -331,7 +281,9 @@ public class GameManager : MonoBehaviour
         {
             case GameState.GenerateGrid:
                 GridManager.Instance.CreateGrid();
-                if (CurrentPlayer == 2) // if AI is the first player, make the first move
+                CurrentPlayer = 1;
+                Debug.Log(GetPlayerType());
+                if (GetPlayerType() == PlayerType.AI) // if AI is the first player, make the first move
                 {
                     StartCoroutine(AIMove());
                 }

@@ -2269,8 +2269,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   State: 0
-  Player1Type: 0
-  Player2Type: 1
+  Player1Type: 1
+  Player2Type: 0
   EndScene: 0
 --- !u!4 &1994619987
 Transform:

@@ -10,7 +10,14 @@
         [SerializeField] private GameObject _highlight;
         [SerializeField] private int _owner = 0;
 
-        public int Owner
+        private static bool clickable = true;
+
+        public void SetClickable(bool value)
+        {
+            clickable = value;
+        }
+
+    public int Owner
         {
             get { return _owner; }
             set { _owner = value; }
@@ -33,9 +40,10 @@
             _highlight.SetActive(false);
         }
 
-        private void OnMouseDown()
-        {
+    private void OnMouseDown()
+    {
         
+        if(clickable){
             if (Owner == 0)
             {
                 Owner = GameManager.CurrentPlayer;
@@ -43,11 +51,10 @@
                 GameManager.Instance.SwitchPlayer();
 
                 // Update the color of the tile based on the owner
-                _renderer.color = Owner == 1 ? Color.blue : Color.red;
+                _renderer.color = Owner == 1 ? Color.red : Color.blue;
 
-            
+
             }
-   
 
             // Extract the x and y index from the GameObject's name
             int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
@@ -60,10 +67,12 @@
 
             if (winner != 0)
             {
+                clickable = false;
+                GameManager.Instance.StopCorutine();
                 Debug.Log("Player " + winner + " wins!");
-                GameManager.Instance.EndGame();
             }
-      
+
             GridManager.Instance.PrintBoardState();
         }
+    }
     }
