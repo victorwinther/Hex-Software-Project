@@ -26,7 +26,7 @@ public class upper_blue : MonoBehaviour
             x = x + 0.455f;
             y = 0.57f; ;
             points.Add(new Vector3(x, y, 0));
-            Debug.Log("i is" + i + "bh is" + boardHeight);
+         
 
             if (i == boardHeight - 1)
             {

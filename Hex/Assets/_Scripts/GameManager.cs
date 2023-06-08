@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     public GameState State;
+    public static bool notHumanTurn = false;
 
     public enum PlayerType { Human, AI }
 
@@ -63,6 +64,7 @@ public class GameManager : MonoBehaviour
 
     public void SwitchPlayer()
     {
+        notHumanTurn = false;
         CurrentPlayer = CurrentPlayer == 1 ? 2 : 1;
 
         if (GetPlayerType() == PlayerType.AI)
@@ -97,7 +99,6 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(1); // wait for 1 second before AI makes move
 
         Vector2 chosenMove;
-        Debug.Log(MainMenuManager.gridSize);
 
         if (MainMenuManager.gridSize == 3)
         {
@@ -105,7 +106,6 @@ public class GameManager : MonoBehaviour
             // Specific strategy for 3x3 grid
             if (opponentMoves.Count == 0)
             {
-                Debug.Log("true");
                 chosenMove = new Vector2(1, 1); // Center position
             }
             else if (opponentMoves.Count == 1)
@@ -284,9 +284,9 @@ public class GameManager : MonoBehaviour
             case GameState.GenerateGrid:
                 GridManager.Instance.CreateGrid();
                 CurrentPlayer = 1;
-                Debug.Log(GetPlayerType());
                 if (GetPlayerType() == PlayerType.AI) // if AI is the first player, make the first move
                 {
+                    notHumanTurn = true;
                     StartCoroutine(AIMove());
                 }
                 break;
@@ -310,21 +310,6 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(EndScene);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 public enum GameState

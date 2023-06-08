@@ -9,6 +9,7 @@
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private GameObject _highlight;
         [SerializeField] private int _owner = 0;
+        
 
         public static bool clickable = true;
 
@@ -42,37 +43,42 @@
 
     private void OnMouseDown()
     {
-        
-        if(clickable){
-            if (Owner == 0)
+        Debug.Log(GameManager.notHumanTurn);
+        if (GameManager.notHumanTurn == false)
+        {
+            if (clickable)
             {
-                Owner = GameManager.CurrentPlayer;
-                GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
-                GameManager.Instance.SwitchPlayer();
+                if (Owner == 0)
+                {
+                    Owner = GameManager.CurrentPlayer;
+                    GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
+                    GameManager.Instance.SwitchPlayer();
 
-                // Update the color of the tile based on the owner
-                _renderer.color = Owner == 1 ? Color.red : Color.blue;
+                    // Update the color of the tile based on the owner
+                    _renderer.color = Owner == 1 ? Color.red : Color.blue;
+                    GameManager.notHumanTurn = true;
 
+                }
 
+                // Extract the x and y index from the GameObject's name
+                int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
+                int yIndex = int.Parse(gameObject.name.Split('|')[1]);
+
+                Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
+
+                GameUtils gameUtils = new GameUtils();
+                int winner = gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
+               
+
+                if (winner != 0)
+                {
+                    clickable = false;
+                    GameManager.Instance.StopCorutine();
+                    Debug.Log("Player " + winner + " wins!");
+                }
+
+                GridManager.Instance.PrintBoardState();
             }
-
-            // Extract the x and y index from the GameObject's name
-            int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
-            int yIndex = int.Parse(gameObject.name.Split('|')[1]);
-
-            Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
-
-            GameUtils gameUtils = new GameUtils();
-            int winner = gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
-
-            if (winner != 0)
-            {
-                clickable = false;
-                GameManager.Instance.StopCorutine();
-                Debug.Log("Player " + winner + " wins!");
-            }
-
-            GridManager.Instance.PrintBoardState();
         }
     }
-    }
+  }

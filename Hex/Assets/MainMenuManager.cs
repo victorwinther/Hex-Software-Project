@@ -24,8 +24,7 @@ public void NumberOfTiles(string value)
     if (int.TryParse(inputField.text, out int newGridSize))
     {
         gridSize = newGridSize;
-        Debug.Log("Grid:" + gridSize);
-        Debug.Log("Grid:" + gridSize);
+       
     }
 }
 
