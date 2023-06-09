@@ -18,6 +18,7 @@ public class EndButton : MonoBehaviour
         }
 
         // Load the end scene
+        Tile.AllowClickable();
         SceneManager.LoadScene(endSceneIndex);
     }
 }

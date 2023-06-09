@@ -18,6 +18,11 @@
             clickable = false;
         }
 
+        public static void AllowClickable()
+        {
+            clickable = true;
+        }
+
     public int Owner
         {
             get { return _owner; }
