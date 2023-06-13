@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 class GameUtils
 {
-    public int CheckWin(Tile[][] matrix, int player)
+    public int CheckWin(int[][] matrix, int player)
 {
     // Create a queue to perform BFS
     Queue<(int, int)> queue = new Queue<(int, int)>();
@@ -14,7 +14,7 @@ class GameUtils
         // Check the top row for player 1's tiles
         for (int c = 0; c < matrix[0].Length; c++)
         {
-            if (matrix[0][c].Owner == player)
+            if (matrix[0][c] == player)
             {
                 // Enqueue the position and mark it as visited
                 queue.Enqueue((0, c));
@@ -45,7 +45,7 @@ class GameUtils
             {
                 // Ensure the position is within the matrix bounds, owned by the player, and not visited
                 if (x >= 0 && x < matrix.Length && y >= 0 && y < matrix[x].Length &&
-                    matrix[x][y].Owner == player && !visited.Contains((x, y)))
+                    matrix[x][y] == player && !visited.Contains((x, y)))
                 {
                     // Enqueue the position and mark it as visited
                     queue.Enqueue((x, y));
@@ -62,7 +62,7 @@ class GameUtils
         // Check the leftmost column for player 2's tiles
         for (int r = 0; r < matrix.Length; r++)
         {
-            if (matrix[r][0].Owner == player)
+            if (matrix[r][0] == player)
             {
                 // Enqueue the position and mark it as visited
                 queue.Enqueue((r, 0));
@@ -93,7 +93,7 @@ class GameUtils
             {
                 // Ensure the position is within the matrix bounds, owned by the player, and not visited
                 if (x >= 0 && x < matrix.Length && y >= 0 && y < matrix[x].Length &&
-                    matrix[x][y].Owner == player && !visited.Contains((x, y)))
+                    matrix[x][y] == player && !visited.Contains((x, y)))
                 {
                     // Enqueue the position and mark it as visited
                     queue.Enqueue((x, y));

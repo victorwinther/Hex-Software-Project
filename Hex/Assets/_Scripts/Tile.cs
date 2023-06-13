@@ -69,7 +69,7 @@
                 Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
                 GameUtils gameUtils = new GameUtils();
-                int winner = gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
+                int winner = gameUtils.CheckWin(GridManager.Instance.tileOwners, Owner);
 
                 if (winner != 0)
                 {

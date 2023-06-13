@@ -43,21 +43,21 @@
             int opponent = CurrentPlayer == 1 ? 2 : 1;
 
             GameUtils gameUtils = new GameUtils();
-            Tile[][] tiles = GridManager.Instance.tiles;
+            int[][] tiles = GridManager.Instance.tileOwners;
 
             for (int r = 0; r < tiles.Length; r++)
             {
                 for (int c = 0; c < tiles[0].Length; c++)
                 {
-                    if (tiles[r][c].Owner == 0) // if the cell is not occupied
+                    if (tiles[r][c] == 0) // if the cell is not occupied
                     {
-                        tiles[r][c].Owner = opponent; // Temporarily assign it to the opponent
+                        tiles[r][c] = opponent; // Temporarily assign it to the opponent
                         if (gameUtils.CheckWin(tiles, opponent) == opponent)
                         {
-                            tiles[r][c].Owner = 0; // Revert the change
+                            tiles[r][c] = 0; // Revert the change
                             return new Vector2(r, c); // Found a move that could block the opponent
                         }
-                        tiles[r][c].Owner = 0; // Revert the change
+                        tiles[r][c] = 0; // Revert the change
                     }
                 }
             }
@@ -105,11 +105,33 @@
 
             switch (AILevel)
             {
-                case AIDifficulty.Easy:
-                    // For easy AI, always make a random move.
-                    chosenMove = GetRandomAvailableTile();  
-                    break;
-                case AIDifficulty.Medium:
+            case AIDifficulty.Easy:
+                int[][] newTiles = DeepCopyJaggedArray(GridManager.Instance.tileOwners);
+                Vector2 bestMove = new Vector2();
+                int maxEval = int.MinValue;
+                var availableMoves = GetAvailableMoves(newTiles);
+                foreach (Vector2 move in availableMoves)
+                {
+                    if (newTiles[(int)move.x][(int)move.y] == 0)  // 0 implies no player has occupied the tile
+                    {
+                        
+                        ApplyMove(newTiles, move, CurrentPlayer);
+                        // changing the depth here should increase the skill of the AI, but hardly increases the
+                        // computational power needed.
+                        int eval = Minimax(newTiles, 3, false);
+                        if (eval > maxEval)
+                        {
+                            maxEval = eval;
+                            bestMove = move;
+                        }
+                        newTiles[(int)move.x][(int)move.y] = 0;  // Undo the move
+                    }
+                }
+                chosenMove = bestMove;
+                break;
+
+
+            case AIDifficulty.Medium:
                     // For medium AI, try to block the opponent, then make a random move if no blocking is needed.
                     Vector2? blockingMove = TryBlockOpponentMove();
                     chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
@@ -187,7 +209,7 @@
             aiMoves.Add(chosenMove);
 
             GameUtils gameUtils = new GameUtils();
-            int winner = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
+            int winner = gameUtils.CheckWin(GridManager.Instance.tileOwners, CurrentPlayer);
 
             if (winner != 0)
             {
@@ -299,16 +321,144 @@
 
 
 
-
-
-        
-
-
-
-
-
-
+    public bool GameOver(int[][] tiles)
+    {
+        GameUtils gameUtils = new GameUtils();
+        int player1Win = gameUtils.CheckWin(tiles, 1);
+        int player2Win = gameUtils.CheckWin(tiles, 2);
+        return player1Win == 1 || player2Win == 2;
     }
+
+    public List<Vector2> GetValidMoves(int[][] tiles)
+    {
+        List<Vector2> validMoves = new List<Vector2>();
+        for (int y = 0; y < tiles.Length; y++)
+        {
+            for (int x = 0; x < tiles[y].Length; x++)
+            {
+                if (tiles[y][x] == 0)
+                {
+                    validMoves.Add(new Vector2(x, y));
+                }
+            }
+        }
+        return validMoves;
+    }
+
+    public void ApplyMove(int[][] tiles, Vector2 move, int player)
+    {
+        int x = (int)move.x;
+        int y = (int)move.y;
+        tiles[y][x] = player;
+    }
+
+
+    public int[][] DeepCopyJaggedArray(int[][] original)
+    {
+        int[][] copy = new int[original.Length][];
+        for (int i = 0; i < original.Length; i++)
+        {
+            copy[i] = new int[original[i].Length];
+            for (int j = 0; j < original[i].Length; j++)
+            {
+                copy[i][j] = original[i][j];
+            }
+        }
+
+        return copy;
+    }
+
+    public int EvaluateTiles(int[][] tiles)
+    {
+        GameUtils gameUtils = new GameUtils();
+
+        // Assuming 1 is the AI player and 2 is the opponent
+        if (gameUtils.CheckWin(tiles, 1) != 0)
+        {
+            return int.MaxValue;
+        }
+        else if (gameUtils.CheckWin(tiles, 2) != 0)
+        {
+            return int.MinValue;
+        }
+        else
+        {
+            int aiScore = 0;
+            int opponentScore = 0;
+
+            for (int i = 0; i < tiles.Length; i++)
+            {
+                for (int j = 0; j < tiles[i].Length; j++)
+                {
+                    if (tiles[i][j] == 1) // Assuming 1 is the AI player
+                    {
+                        aiScore++;
+                    }
+                    else if (tiles[i][j] == 2) // Assuming 2 is the opponent
+                    {
+                        opponentScore++;
+                    }
+                }
+            }
+
+            return aiScore - opponentScore;
+        }
+    }
+
+
+    // Create a method to get available moves:
+    private List<Vector2> GetAvailableMoves(int[][] grid)
+    {
+        var availableMoves = new List<Vector2>();
+        for (int i = 0; i < grid.Length; i++)
+        {
+            for (int j = 0; j < grid[i].Length; j++)
+            {
+                if (grid[i][j] == 0)
+                { // Assuming 0 means the tile is unclaimed
+                    availableMoves.Add(new Vector2(i, j));
+                }
+            }
+        }
+        return availableMoves;
+    }
+
+
+
+    public int Minimax(int[][] tiles, int depth, bool isMaximizingPlayer)
+    {
+        if (depth == 0 || GameOver(tiles))
+        {
+            return EvaluateTiles(tiles);
+        }
+
+        if (isMaximizingPlayer)
+        {
+            int maxEval = int.MinValue;
+            foreach (Vector2 move in GetValidMoves(tiles))
+            {
+                int[][] newTiles = DeepCopyJaggedArray(tiles);
+                ApplyMove(newTiles, move, isMaximizingPlayer ? 1 : 2);
+                int eval = Minimax(newTiles, depth - 1, false);
+                maxEval = Math.Max(maxEval, eval);
+            }
+            return maxEval;
+        }
+        else
+        {
+            int minEval = int.MaxValue;
+            foreach (Vector2 move in GetValidMoves(tiles))
+            {
+                int[][] newTiles = DeepCopyJaggedArray(tiles);
+                ApplyMove(newTiles, move, isMaximizingPlayer ? 1 : 2);
+                int eval = Minimax(newTiles, depth - 1, true);
+                minEval = Math.Min(minEval, eval);
+            }
+            return minEval;
+        }
+    }
+
+}
 
 
     public enum GameState

@@ -2271,7 +2271,7 @@ MonoBehaviour:
   State: 0
   Player1Type: 1
   Player2Type: 0
-  AILevel: 2
+  AILevel: 0
   EndScene: 0
 --- !u!4 &1994619987
 Transform:
