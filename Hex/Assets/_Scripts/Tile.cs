@@ -48,27 +48,28 @@
         {
             if (clickable)
             {
+                // Extract the x and y index from the GameObject's name
+                int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
+                int yIndex = int.Parse(gameObject.name.Split('|')[1]);
+
                 if (Owner == 0)
                 {
                     Owner = GameManager.CurrentPlayer;
-                    GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
+                    GameManager.Instance.RecordOpponentMove(xIndex, yIndex);
                     GameManager.Instance.SwitchPlayer();
 
                     // Update the color of the tile based on the owner
                     _renderer.color = Owner == 1 ? Color.red : Color.blue;
                     GameManager.notHumanTurn = true;
 
+                    // Update the corresponding tileOwners element after updating Owner
+                    GridManager.Instance.tileOwners[xIndex][yIndex] = Owner;
                 }
-
-                // Extract the x and y index from the GameObject's name
-                int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
-                int yIndex = int.Parse(gameObject.name.Split('|')[1]);
 
                 Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
                 GameUtils gameUtils = new GameUtils();
                 int winner = gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
-               
 
                 if (winner != 0)
                 {
@@ -81,4 +82,5 @@
             }
         }
     }
-  }
+
+}

@@ -19,6 +19,8 @@ public class GridManager : MonoBehaviour
     public Transform Tile;
 
     public Tile[][] tiles;
+    public int[][] tileOwners;
+
     public int gridSize = 3;
 
     public float tileSize; // Adjust the size of the tiles
@@ -39,12 +41,19 @@ public class GridManager : MonoBehaviour
     {
         
         int gridSize = MainMenuManager.gridSize;
-       
+       // creating the tile array
         tiles = new Tile[gridSize][];
         for (int i = 0; i < gridSize; i++)
         {
             tiles[i] = new Tile[gridSize];
         }
+        // creating the int array
+        tileOwners = new int[gridSize][];
+        for (int i = 0; i < gridSize; i++)
+        {
+            tileOwners[i] = new int[gridSize];
+        }
+
 
         float offRoxXOffset = 0.9f;
         float yOffset = 0.77f;
@@ -62,8 +71,10 @@ public class GridManager : MonoBehaviour
                 Tile tileScript = hex.gameObject.GetComponent<Tile>();
 
                 tiles[x][y] = tileScript;
+                tileOwners[x][y] = tileScript.Owner; // Assign the owner to tileOwners
             }
         }
+
     }
 
     public Tile GetTileAtPostion(Vector2 pos)
@@ -85,11 +96,11 @@ public class GridManager : MonoBehaviour
         {
             for (int x = 0; x < MainMenuManager.gridSize; x++)
             {
-                if (tiles[x][y].Owner == 0)
+                if (tileOwners[x][y] == 0)
                     boardState += "0 "; // Unclaimed
-                else if (tiles[x][y].Owner == 1)
+                else if (tileOwners[x][y] == 1)
                     boardState += "1 "; // Player 1
-                else if (tiles[x][y].Owner == 2)
+                else if (tileOwners[x][y] == 2)
                     boardState += "2 "; // Player 2
             }
             boardState += "\n";

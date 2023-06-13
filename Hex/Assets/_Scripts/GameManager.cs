@@ -174,154 +174,15 @@
                     chosenMove = GetRandomAvailableTile();
                     break;
             }
-            /*
-            if (MainMenuManager.gridSize == 3)
-            {
-                if (Player2Type == PlayerType.AI)
-                {
-
-                    // Specific strategy for 3x3 grid VERTICAL
-                    if (opponentMoves.Count == 0)
-                    {
-                        chosenMove = new Vector2(1, 1); // Center position
-                    }
-                    else if (opponentMoves.Count == 1)
-                    {
-                        if (opponentMoves[0].y == 0) // Top row
-                        {
-                            chosenMove = GridManager.Instance.tiles[1][0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
-                        }
-                        else if (opponentMoves[0].y == 1) // Middle row
-                        {
-                        
-                        
-                            {
-                                chosenMove = GridManager.Instance.tiles[1][0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
-                            }
-                        }
-                        else // opponentMoves[0].y == 2 Bottom row
-                        {
-                            chosenMove = GridManager.Instance.tiles[0][2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
-                        }
-                        secondMove = chosenMove; // Record the second move of AI
-                    }
-                    else // opponentMoves.Count == 2
-                    {
-                        if (opponentMoves[0].y == 0) // Top row
-                        {
-                            chosenMove = GridManager.Instance.tiles[0][2].Owner == 0 ? new Vector2(0, 2) : new Vector2(1, 2);
-                        }
-                        else // opponentMoves[0].y == 2 Bottom row
-                        {
-                            chosenMove = GridManager.Instance.tiles[1][0].Owner == 0 ? new Vector2(1, 0) : new Vector2(2, 0);
-                        }
-                    }
-
-                    // If the chosen tile is not available, switch to the default random strategy
-                    if (GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner != 0)
-                    {
-                        chosenMove = GetRandomAvailableTile();
-                    }
-
-
-                }
-                else
-                // HORIZONTAL ATTEMPT HERE 
-                {
-                    // Specific strategy for 3x3 grid
-                    if (opponentMoves.Count == 0)
-                    {
-                        chosenMove = new Vector2(1, 1); // Center position
-                    }
-                    else if (opponentMoves.Count == 1)
-                    {
-                        if (opponentMoves[0].x == 2) // Right column
-                        {
-                            chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
-                        }
-                        else if (opponentMoves[0].x == 1) // Middle column
-                        {
-                        
-                      
-                            {
-                                chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
-                            }
-                        }
-                        else // opponentMoves[0].y == 2 left column
-                        {
-                            chosenMove = GridManager.Instance.tiles[0][1].Owner == 0 ? new Vector2(0, 1) : new Vector2(0, 2);
-                        }
-                        secondMove = chosenMove; // Record the second move of AI
-                    }
-                    else // opponentMoves.Count == 2
-                    {
-                        if (opponentMoves[0].x == 2) // Right column
-                        {
-                            chosenMove = GridManager.Instance.tiles[0][1].Owner == 0 ? new Vector2(0, 1) : new Vector2(0, 2);
-                        }
-                        else // opponentMoves[0].y == 2 left column
-                        {
-                            chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
-                        }
-                    }
-
-                    // If the chosen tile is not available, switch to the default random strategy
-                    if (GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner != 0)
-                    {
-                        chosenMove = GetRandomAvailableTile();
-                    }
-
-                }
-
-
-
-
-            }
-            else if (MainMenuManager.gridSize == 2)
-            {
-                // Specific strategy for 2x2 grid
-                if (aiMoves.Count == 0)
-                {
-                    // Always take the cell (1,0)
-                    chosenMove = new Vector2(1, 0);
-                }
-                else
-                {
-                    // pick either (0,1) or (1,1) depending on which one is available
-                    if (GridManager.Instance.tiles[0][1].Owner == 0)
-                    {
-                        chosenMove = new Vector2(0, 1);
-                    }
-                    else if (GridManager.Instance.tiles[1][1].Owner == 0)
-                    {
-                        chosenMove = new Vector2(1, 1);
-                    }
-                    else
-                    {
-                        // Default random strategy
-                        chosenMove = GetRandomAvailableTile();
-                    }
-                }
-            }
-            else
-            {
-                // For other grid sizes, first try to block the opponent, then make a random move if no blocking is needed.
-                Vector2? blockingMove = TryBlockOpponentMove();
-                if (blockingMove.HasValue)
-                {
-                    chosenMove = blockingMove.Value;
-                }
-                else
-                {
-                    chosenMove = GetRandomAvailableTile();
-                }
-            }
-            */
+          
             // Make the chosen move
 
             GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
             GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
 
+            // Update the corresponding tileOwners element after the AI move
+            GridManager.Instance.tileOwners[(int)chosenMove.x][(int)chosenMove.y] = CurrentPlayer;
+            
             // Record AI's move
             aiMoves.Add(chosenMove);
 
@@ -435,6 +296,18 @@
             PlayerPrefs.SetString("WinningPlayerName", winningPlayerName);
             SceneManager.LoadScene(EndScene);
         }
+
+
+
+
+
+        
+
+
+
+
+
+
     }
 
 
