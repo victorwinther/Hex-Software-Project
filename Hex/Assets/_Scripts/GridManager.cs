@@ -56,6 +56,7 @@ public class GridManager : MonoBehaviour
                 float xPos = x * offRoxXOffset + (y * offRoxXOffset) / 2;
                 Transform hex = Instantiate(Tile) as Transform;
                 hex.position = new Vector2(xPos, -y * yOffset);
+                hex.parent = this.transform;
                 hex.name = "Hexagon" + x + "|" + y;
                 hex.gameObject.AddComponent<BoxCollider2D>();
 

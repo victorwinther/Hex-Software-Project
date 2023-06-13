@@ -8,17 +8,13 @@ public class EndButton : MonoBehaviour
 
     public void EndGame()
     {
-        // Check if there is a winning player
-        bool hasWinner = PlayerPrefs.HasKey("WinningPlayerName");
-
-        if (!hasWinner)
-        {
-            // No winner, set "No Winner" as the winning player name
-            PlayerPrefs.SetString("WinningPlayerName", "No Winner");
-        }
-
+        
         // Load the end scene
         Tile.AllowClickable();
+        GameManager.notHumanTurn = false;
+        PlayerTurnText.win = false;
+        MainMenuManager.Player1Type = "Human";
+        MainMenuManager.Player2Type = "Human";
         SceneManager.LoadScene(endSceneIndex);
     }
 }

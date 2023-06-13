@@ -38,7 +38,9 @@
 
         void OnMouseEnter()
         {
+        if (clickable) { 
             _highlight.SetActive(true);
+             }
         }
 
         void OnMouseExit()
@@ -55,13 +57,16 @@
             {
                 if (Owner == 0)
                 {
+                    Console.WriteLine("Visited positions:");
                     Owner = GameManager.CurrentPlayer;
                     GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
                     GameManager.Instance.SwitchPlayer();
 
                     // Update the color of the tile based on the owner
                     _renderer.color = Owner == 1 ? Color.red : Color.blue;
+                    if (!GameManager.Instance.BothHuman()) { 
                     GameManager.notHumanTurn = true;
+                    }
 
                 }
 
@@ -72,13 +77,19 @@
                 Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
                 GameUtils gameUtils = new GameUtils();
-                int winner = gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
-               
+                (int winner, List<(int, int)> path)= gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
 
                 if (winner != 0)
                 {
+                    Debug.Log("Shortest path:");
+                    foreach ((int x, int y) in path)
+                    {
+                        GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = Color.cyan;
+                        Debug.Log($"({x}, {y})");
+                    }
                     clickable = false;
                     GameManager.Instance.StopCorutine();
+                    PlayerTurnText.win = true;
                     Debug.Log("Player " + winner + " wins!");
                 }
 

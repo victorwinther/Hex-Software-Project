@@ -7,30 +7,39 @@ public class Camera_controller : MonoBehaviour
 {
     [SerializeField]
     private Camera cam;
-    
 
     [SerializeField]
     private float zoomStep, minCamSize, maxCamSize;
 
     [SerializeField]
     private SpriteRenderer mapRenderer;
-
+    
     private float mapMinX, mapMaxX, mapMinY, mapMaxY;
 
     private Vector3 dragOrigin;
 
     private void Awake()
     {
-        mapMinX = mapRenderer.transform.position.x - mapRenderer.bounds.size.x / 2f;
-        mapMaxX = mapRenderer.transform.position.x + mapRenderer.bounds.size.x / 2f;
+       mapMinX = mapRenderer.transform.position.x - mapRenderer.bounds.size.x / 2f;
+       mapMaxX = mapRenderer.transform.position.x + mapRenderer.bounds.size.x / 2f;
 
-        mapMinY = mapRenderer.transform.position.y - mapRenderer.bounds.size.y / 2f;
-        mapMaxY = mapRenderer.transform.position.y + mapRenderer.bounds.size.y / 2f;
+       mapMinY = mapRenderer.transform.position.y - mapRenderer.bounds.size.y / 2f;
+       mapMaxY = mapRenderer.transform.position.y + mapRenderer.bounds.size.y / 2f;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f) // forward
+        {
+            zoomStep = 0.1f;
+            ZoomIn();
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0f) // backwards
+        {
+            zoomStep = 0.1f;
+            ZoomOut();
+        }
         PanCamera();
         CalculateMaxZoom();
     }
@@ -47,6 +56,16 @@ public class Camera_controller : MonoBehaviour
 
      
         }
+    }
+    public void ZoomInButton()
+    {
+        zoomStep = 1;
+        ZoomIn();
+    }
+    public void ZoomOutButton()
+    {
+        zoomStep = 1;
+        ZoomOut();
     }
     public void ZoomIn()
     {

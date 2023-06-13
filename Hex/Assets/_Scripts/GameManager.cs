@@ -19,8 +19,8 @@
         public enum PlayerType { Human, AI }
         public enum AIDifficulty { Easy, Medium, Hard }
 
-        public PlayerType Player1Type;
-        public PlayerType Player2Type;
+        private PlayerType Player1Type;
+        private PlayerType Player2Type;
         public AIDifficulty AILevel; // add AI difficulty level
 
         public static int CurrentPlayer;
@@ -52,7 +52,8 @@
                     if (tiles[r][c].Owner == 0) // if the cell is not occupied
                     {
                         tiles[r][c].Owner = opponent; // Temporarily assign it to the opponent
-                        if (gameUtils.CheckWin(tiles, opponent) == opponent)
+                    (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, opponent);
+                    if (winner == opponent)
                         {
                             tiles[r][c].Owner = 0; // Revert the change
                             return new Vector2(r, c); // Found a move that could block the opponent
@@ -63,13 +64,24 @@
             }
             return null; // No blocking move found
         }
-
+        public bool BothHuman()
+        {
+        if(Player1Type == PlayerType.Human && Player2Type == PlayerType.Human)
+        {
+            return true;
+        } else
+        {
+            return false;
+        }
+        }
         public void SwitchPlayer()
         {
+        
             notHumanTurn = false;
+
             CurrentPlayer = CurrentPlayer == 1 ? 2 : 1;
 
-            if (GetPlayerType() == PlayerType.AI)
+        if (GetPlayerType() == PlayerType.AI)
             {
                 StartCoroutine(AIMove());
             }
@@ -326,19 +338,27 @@
             aiMoves.Add(chosenMove);
 
             GameUtils gameUtils = new GameUtils();
-            int winner = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
+        (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
 
-            if (winner != 0)
+        if (winner != 0)
+        {
+            Debug.Log("Shortest path:");
+            foreach ((int x, int y) in path)
             {
-                Debug.Log("Player " + winner + " wins!");
-
-                Tile.SetClickable();
-
+                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = Color.cyan;
+               
+                Debug.Log($"({x}, {y})");
             }
+           
+            PlayerTurnText.win = true;
+            Tile.SetClickable();
 
-            // Log AI's move
+        }
+        else { SwitchPlayer(); }
+
+          
             Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
-            SwitchPlayer();
+            
         }
 
         // Method to get a random available tile
@@ -385,6 +405,12 @@
             }
         }
 
+        public void MakeBothHuman()
+    {
+        Player1Type = PlayerType.Human;
+        Player2Type = PlayerType.AI;
+    }
+
         // Record the opponent's move after every player action
         public void RecordOpponentMove(int x, int y)
         {
@@ -393,6 +419,26 @@
                 opponentMoves.Add(new Vector2(x, y));
             }
         }
+
+        public void UpdatePlayerTypes()
+    {
+        if(MainMenuManager.Player1Type == "Human")
+        {
+            Player1Type = PlayerType.Human;
+        }
+        else {
+            Player1Type = PlayerType.AI;
+                }
+
+        if (MainMenuManager.Player2Type == "Human")
+        {
+            Player2Type = PlayerType.Human;
+        }
+        else
+        {
+            Player2Type = PlayerType.AI;
+        }
+    }
 
         // Start is called before the first frame update
         void Start()
@@ -408,6 +454,7 @@
                 case GameState.GenerateGrid:
                     GridManager.Instance.CreateGrid();
                     CurrentPlayer = 1;
+                     UpdatePlayerTypes();
                     if (Player1Type == PlayerType.AI) // if Player1 is AI, make the first move
                     {
                         notHumanTurn = true;
