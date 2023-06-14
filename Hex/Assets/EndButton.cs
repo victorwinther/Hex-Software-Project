@@ -15,7 +15,6 @@ public class EndButton : MonoBehaviour
         PlayerTurnText.win = false;
         MainMenuManager.Player1Type = "Human";
         MainMenuManager.Player2Type = "Human";
-
         GameManager.playerSwitchCount=0;
         SceneManager.LoadScene(endSceneIndex);
     }

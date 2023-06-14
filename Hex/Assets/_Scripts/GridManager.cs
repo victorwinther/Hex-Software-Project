@@ -19,7 +19,7 @@ public class GridManager : MonoBehaviour
     public Transform Tile;
 
     public Tile[][] tiles;
-    public int gridSize = 3;
+    public int gridSize = 11;
 
     public float tileSize; // Adjust the size of the tiles
 
