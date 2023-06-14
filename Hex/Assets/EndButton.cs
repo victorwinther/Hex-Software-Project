@@ -8,7 +8,6 @@ public class EndButton : MonoBehaviour
 
     public void EndGame()
     {
-        
         // Load the end scene
         Tile.AllowClickable();
         GameManager.notHumanTurn = false;

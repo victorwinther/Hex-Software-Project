@@ -37,9 +37,9 @@ public class GridManager : MonoBehaviour
 
     public void CreateGrid()
     {
-        
+
         int gridSize = MainMenuManager.gridSize;
-       
+
         tiles = new Tile[gridSize][];
         for (int i = 0; i < gridSize; i++)
         {
@@ -98,4 +98,39 @@ public class GridManager : MonoBehaviour
 
         Debug.Log(boardState);
     }
+
+    public void SaveGame()
+    {
+        SaveData saveData = new SaveData(gridSize, GameManager.CurrentPlayer, tiles);
+
+        string json = JsonUtility.ToJson(saveData);
+
+        PlayerPrefs.SetString("SaveData", json);
+        PlayerPrefs.Save();
+    }
+
+    public void LoadGame()
+    {
+        if (PlayerPrefs.HasKey("SaveData"))
+        {
+            string json = PlayerPrefs.GetString("SaveData");
+
+            SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+
+            gridSize = saveData.gridSize;
+            GameManager.CurrentPlayer = saveData.currentPlayer;
+            for (int x = 0; x < gridSize; x++)
+            {
+                for (int y = 0; y < gridSize; y++)
+                {
+                    tiles[x][y].Owner = saveData.boardState[x][y];
+                }
+            }
+        }
+        else
+        {
+            Debug.Log("No save data found");
+        }
+    }
+
 }
