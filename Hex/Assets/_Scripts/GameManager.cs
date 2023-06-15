@@ -156,7 +156,8 @@ public class GameManager : MonoBehaviour
 
         private PlayerType Player1Type;
         private PlayerType Player2Type;
-        public AIDifficulty AILevel; // add AI difficulty level
+        public AIDifficulty Player1AILevel; // add AI difficulty level
+        public AIDifficulty Player2AILevel;
 
         public static int CurrentPlayer;
         public static int playerSwitchCount = 0;
@@ -212,6 +213,10 @@ public class GameManager : MonoBehaviour
         }
         public void SwitchPlayer()
         {
+        if (GridManager.Instance.isHighlighted)
+        {
+            GridManager.Instance.onClick();
+        }
             playerSwitchCount++;
             notHumanTurn = false;
 
@@ -239,6 +244,7 @@ public class GameManager : MonoBehaviour
 
         private List<Vector2> opponentMoves = new List<Vector2>();
         private List<Vector2> aiMoves = new List<Vector2>();
+        private List<Vector2> allChosenMoves = new List<Vector2>();
 
         public void StopCorutine()
         {
@@ -246,25 +252,33 @@ public class GameManager : MonoBehaviour
         }
     
         private Vector2 secondMove;
-        private IEnumerator AIMove()
+    private IEnumerator AIMove()
+    {
+        yield return new WaitForSeconds(0.5f); // wait for 1 second before AI makes move
+
+        //default value.
+        Vector2 chosenMove = GetRandomAvailableTile();
+        AIDifficulty aiDifficulty = CurrentPlayer == 1 ? Player1AILevel : Player2AILevel;
+        allChosenMoves.Add(chosenMove);
+        foreach (Vector2 move in allChosenMoves)
         {
-            yield return new WaitForSeconds(0.5f); // wait for 1 second before AI makes move
+            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+        }
 
-            //default value.
-            Vector2 chosenMove = GetRandomAvailableTile();
 
-            switch (AILevel)
-            {
-                case AIDifficulty.Easy:
-                    // For easy AI, always make a random move.
-                    chosenMove = GetRandomAvailableTile();  
-                    break;
-                case AIDifficulty.Medium:
-                    // For medium AI, try to block the opponent, then make a random move if no blocking is needed.
-                    Vector2? blockingMove = TryBlockOpponentMove();
-                    chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
-                    break;
-                case AIDifficulty.Hard:
+        switch (aiDifficulty)
+        {
+
+            case AIDifficulty.Easy:
+                // For easy AI, always make a random move.
+                chosenMove = GetRandomAvailableTile();
+                break;
+            case AIDifficulty.Medium:
+                // For medium AI, try to block the opponent, then make a random move if no blocking is needed.
+                Vector2? blockingMove = TryBlockOpponentMove();
+                chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
+                break;
+            case AIDifficulty.Hard:
                 // For hard AI, implement your own strategy here. This example uses the same strategy as the medium level.
                 if (MainMenuManager.gridSize == 3)
                 {
@@ -314,39 +328,35 @@ public class GameManager : MonoBehaviour
                     }
 
                 }
+
                 else
                 {
                     blockingMove = TryBlockOpponentMove();
                     chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
                 }
-                    break;
-                default:
-                    chosenMove = GetRandomAvailableTile();
-                    break;
-            }
-        
-            // Make the chosen move
-            GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
-            GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
+                break;
+            default:
+                chosenMove = GetRandomAvailableTile();
+                break;
+        }
 
             // Record AI's move
             aiMoves.Add(chosenMove);
             // Adds move to the list of all moves.  
             RecordMove((int)chosenMove.x, (int)chosenMove.y);
+        // Make the chosen move
+        GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
 
-            GameUtils gameUtils = new GameUtils();
+        // Record AI's move
+        aiMoves.Add(chosenMove);
+
+        GameUtils gameUtils = new GameUtils();
         (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
 
         if (winner != 0)
         {
-            Debug.Log("Shortest path:");
-            foreach ((int x, int y) in path)
-            {
-                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = Color.cyan;
-               
-                Debug.Log($"({x}, {y})");
-            }
-           
+            StartCoroutine(Tile.WinColors(path, CurrentPlayer));
             PlayerTurnText.win = true;
             Tile.SetClickable();
             isGameOver = true;
@@ -355,11 +365,14 @@ public class GameManager : MonoBehaviour
 
         }
         else { SwitchPlayer(); }
+        Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
+    }
 
-          
-            Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
-            
-        }
+
+        
+
+    
+
 
     private Vector2 GetRandomAvailableTile()
     {
@@ -418,6 +431,7 @@ public class GameManager : MonoBehaviour
         return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count)];
     }
 }
+        
 
 private int GetOwnedNeighborCount(int x, int y)
 {
@@ -442,33 +456,130 @@ private int GetOwnedNeighborCount(int x, int y)
     return count;
 }
 
-        // Record the opponent's move after every player action
-        public void RecordOpponentMove(int x, int y)
+public void RecordOpponentMove(int x, int y)
+{
+    if (GetPlayerType() == PlayerType.Human)
+    {
+        Vector2 newMove = new Vector2(x, y);
+        opponentMoves.Add(newMove);
+
+        // Add the new move to allChosenMoves only if it doesn't already exist
+        if (!allChosenMoves.Contains(newMove))
         {
-            if (GetPlayerType() == PlayerType.Human)
-            {
-                opponentMoves.Add(new Vector2(x, y));
-            }
+            allChosenMoves.Add(newMove);
         }
+    }
+
+    foreach (Vector2 move in allChosenMoves)
+    {
+        Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+    }
+}
+
+public void PrintAllChosenMoves()
+{
+    foreach (Vector2 move in allChosenMoves)
+    {
+        Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+    }
+
+    ResetGameState();
+
+    StartCoroutine(PlaceMovesWithDelay());
+}
+
+private Color[] playerColors = { Color.red, Color.blue };
+
+private IEnumerator PlaceMovesWithDelay()
+{
+    int currentPlayerIndex = 0;
+
+    foreach (var move in allChosenMoves)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        int x = (int)move.x;
+        int y = (int)move.y;
+
+        GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
+
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+    }
+
+    Tile.SetClickable();
+}
+
+/*
+private IEnumerator PlaceMovesWithDelay()
+{
+    foreach (var move in allChosenMoves)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        GridManager.Instance.tiles[(int)move.x][(int)move.y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[(int)move.x][(int)move.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
+    }
+
+    Tile.SetClickable();
+}
+*/
+
+public List<Vector2> GetAllChosenMoves()
+{
+    PrintAllChosenMoves();
+    return allChosenMoves;
+}
+
+public void ResetGameState()
+{
+    // Reset the game state to the standard
+    UpdateGameState(GameState.GenerateGrid);
+}
 
         public void UpdatePlayerTypes()
     {
-        if(MainMenuManager.Player1Type == "Human")
+        String playerType1 = MainMenuManager.Player1Type;
+        if (playerType1 == "Human")
         {
             Player1Type = PlayerType.Human;
+           
         }
-        else {
+        else if (playerType1 == "AI Easy") {
             Player1Type = PlayerType.AI;
-                }
-
-        if (MainMenuManager.Player2Type == "Human")
+            Player1AILevel = AIDifficulty.Easy;
+            }
+        else if (playerType1 == "AI Medium")
+        {
+            Player1Type = PlayerType.AI;
+            Player1AILevel = AIDifficulty.Medium;
+        }
+        else if (playerType1 == "AI Hard")
+        {
+            Player1Type = PlayerType.AI;
+            Player1AILevel = AIDifficulty.Hard;
+        }
+        String playerType2 = MainMenuManager.Player2Type;
+        if (playerType2 == "Human")
         {
             Player2Type = PlayerType.Human;
         }
-        else
+        else if(playerType2 == "AI Easy")
         {
             Player2Type = PlayerType.AI;
+            Player2AILevel = AIDifficulty.Easy;
         }
+        else if (playerType2 == "AI Medium")
+        {
+            Player2Type = PlayerType.AI;
+            Player2AILevel = AIDifficulty.Medium;
+        }
+        else if (playerType2 == "AI Hard")
+        {
+            Player2Type = PlayerType.AI;
+            Player2AILevel = AIDifficulty.Hard;
+        }
+
     }
 
         // Start is called before the first frame update

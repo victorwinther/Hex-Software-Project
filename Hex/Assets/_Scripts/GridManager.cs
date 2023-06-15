@@ -19,7 +19,7 @@ public class GridManager : MonoBehaviour
     public Transform Tile;
 
     public Tile[][] tiles;
-    public int gridSize = 3;
+    public int gridSize = 11;
 
     public float tileSize; // Adjust the size of the tiles
 
@@ -34,6 +34,66 @@ public class GridManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    private Color originalColor;
+    public bool isHighlighted;
+    List<Hex> shortestPath;
+    Color newColor;
+    public void onClick()
+    {
+        // Create an instance of HexTileGame
+        HexTileGame game = new HexTileGame(GridManager.Instance.tiles);
+        // Call the FindShortestPath method
+       
+
+        if (!isHighlighted)
+        {
+            shortestPath = game.FindShortestPath(GameManager.CurrentPlayer);
+            Debug.Log("Shortest Path in tile");
+            string s = "";
+            foreach (Hex hex in shortestPath)
+            {
+                s += ($"Position: ({hex.Position.Row}, {hex.Position.Col}), Value: {hex.Value}");
+                s += "\n";
+            }
+            Debug.Log(s);
+            // Print the path
+            //Console.WriteLine("Shortest Path:");
+            
+
+            if (GameManager.CurrentPlayer == 2) 
+            {
+                newColor = ColorUtility.TryParseHtmlString("#00A8FF", out Color convertedColor) ? convertedColor : Color.magenta;
+                newColor.a = 0.2f;
+            } else
+            {
+                newColor = Color.red;
+                newColor.a = 0.5f;
+            }
+          
+            foreach (Hex hex in shortestPath)
+            {
+                if (GridManager.Instance.tiles[hex.Position.Col][hex.Position.Row].GetComponent<SpriteRenderer>().color == Color.white)
+                {
+                    GridManager.Instance.tiles[hex.Position.Col][hex.Position.Row].GetComponent<SpriteRenderer>().color = newColor;
+                };
+
+            }
+            isHighlighted = true;
+        } else
+        {
+            foreach (Hex hex in shortestPath)
+            {
+                if (GridManager.Instance.tiles[hex.Position.Col][hex.Position.Row].GetComponent<SpriteRenderer>().color == newColor)
+                {
+                    GridManager.Instance.tiles[hex.Position.Col][hex.Position.Row].GetComponent<SpriteRenderer>().color = Color.white;
+                };
+
+            }
+            isHighlighted = false;
+
+        }
+    }
+
 
     public void CreateGrid()
     {

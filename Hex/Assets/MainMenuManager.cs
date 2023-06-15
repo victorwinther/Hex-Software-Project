@@ -15,7 +15,7 @@ public class MainMenuManager : MonoBehaviour
     public InputField inputField;
     public Text output;
     public GridManager gridManager;
-    public static int gridSize = 5;
+    public static int gridSize = 11;
 
     public TextMeshProUGUI output1;
 
@@ -25,7 +25,7 @@ public class MainMenuManager : MonoBehaviour
     public void NumberOfTiles(string value)
 {
     output.text = inputField.text;
-        gridSize = 5;
+        gridSize = 11;
 
     if (int.TryParse(inputField.text, out int newGridSize))
     {
@@ -42,7 +42,15 @@ public class MainMenuManager : MonoBehaviour
         }
         if (val == 1)
         {
-            Player1Type = "AI";
+            Player1Type = "AI Easy";
+        }
+        if (val == 2)
+        {
+            Player1Type = "AI Medium";
+        }
+        if (val == 3)
+        {
+            Player1Type = "AI Hard";
         }
     }
 
@@ -54,7 +62,15 @@ public class MainMenuManager : MonoBehaviour
         }
         if (val == 1)
         {
-            Player2Type = "AI";
+            Player2Type = "AI Easy";
+        }
+        if (val == 2)
+        {
+            Player2Type = "AI Medium";
+        }
+        if (val == 3)
+        {
+            Player2Type = "AI Hard";
         }
     }
 
