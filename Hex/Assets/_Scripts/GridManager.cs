@@ -43,7 +43,7 @@ public class GridManager : MonoBehaviour
         // Create an instance of HexTileGame
         HexTileGame game = new HexTileGame(GridManager.Instance.tiles);
         // Call the FindShortestPath method
-       
+
 
         if (!isHighlighted)
         {
@@ -58,18 +58,19 @@ public class GridManager : MonoBehaviour
             Debug.Log(s);
             // Print the path
             //Console.WriteLine("Shortest Path:");
-            
 
-            if (GameManager.CurrentPlayer == 2) 
+
+            if (GameManager.CurrentPlayer == 2)
             {
                 newColor = ColorUtility.TryParseHtmlString("#00A8FF", out Color convertedColor) ? convertedColor : Color.magenta;
                 newColor.a = 0.2f;
-            } else
+            }
+            else
             {
                 newColor = Color.red;
                 newColor.a = 0.5f;
             }
-          
+
             foreach (Hex hex in shortestPath)
             {
                 if (GridManager.Instance.tiles[hex.Position.Col][hex.Position.Row].GetComponent<SpriteRenderer>().color == Color.white)
@@ -79,7 +80,8 @@ public class GridManager : MonoBehaviour
 
             }
             isHighlighted = true;
-        } else
+        }
+        else
         {
             foreach (Hex hex in shortestPath)
             {
@@ -97,9 +99,9 @@ public class GridManager : MonoBehaviour
 
     public void CreateGrid()
     {
-        
+
         int gridSize = MainMenuManager.gridSize;
-       
+
         tiles = new Tile[gridSize][];
         for (int i = 0; i < gridSize; i++)
         {
@@ -113,10 +115,10 @@ public class GridManager : MonoBehaviour
         for (int x = 0; x < gridSize; x++)
         {
             for (int y = 0; y < gridSize; y++)
-            { 
-                float xPos = (x+xStart) * offRoxXOffset + (y * offRoxXOffset) / 2;
+            {
+                float xPos = (x + xStart) * offRoxXOffset + (y * offRoxXOffset) / 2;
                 Transform hex = Instantiate(Tile) as Transform;
-                hex.position = new Vector2(xPos, -(y+yStart) * yOffset);
+                hex.position = new Vector2(xPos, -(y + yStart) * yOffset);
                 hex.parent = this.transform;
                 hex.name = "Hexagon" + x + "|" + y;
                 hex.gameObject.AddComponent<BoxCollider2D>();

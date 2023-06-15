@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 class GameUtils
 {
     public (int, List<(int, int)>) CheckWin(Tile[][] matrix, int player)
-{
+    {
         // Create a queue to perform BFS
         Queue<(int, int)> queue = new Queue<(int, int)>();
         // Create a set to keep track of visited positions
@@ -48,7 +48,7 @@ class GameUtils
                         currentPosition = parent[currentPosition];
                     }
                     // Player 1 has won, return the player number
-                    return (player,shortestPath);
+                    return (player, shortestPath);
                 }
 
                 // Define the neighboring positions
@@ -76,29 +76,29 @@ class GameUtils
         }
 
         else if (player == 2)
-    {
-        // Check the leftmost column for player 2's tiles
-        for (int r = 0; r < matrix.Length; r++)
         {
-            if (matrix[r][0].Owner == player)
+            // Check the leftmost column for player 2's tiles
+            for (int r = 0; r < matrix.Length; r++)
             {
-                // Enqueue the position and mark it as visited
-                queue.Enqueue((r, 0));
-                visited.Add((r, 0));
-                parent[(r, 0)] = (-1, -1); // Set a dummy parent for the starting position
+                if (matrix[r][0].Owner == player)
+                {
+                    // Enqueue the position and mark it as visited
+                    queue.Enqueue((r, 0));
+                    visited.Add((r, 0));
+                    parent[(r, 0)] = (-1, -1); // Set a dummy parent for the starting position
                 }
-        }
+            }
 
-        // Perform BFS
-        while (queue.Count > 0)
-        {
-            // Dequeue a position
-            (int r, int c) = queue.Dequeue();
-
-            // Check if the current position is in the rightmost column
-            if (c == matrix[0].Length - 1)
-
+            // Perform BFS
+            while (queue.Count > 0)
             {
+                // Dequeue a position
+                (int r, int c) = queue.Dequeue();
+
+                // Check if the current position is in the rightmost column
+                if (c == matrix[0].Length - 1)
+
+                {
                     List<(int, int)> shortestPath = new List<(int, int)>();
                     (int, int) currentPosition = (r, c);
 
@@ -111,34 +111,34 @@ class GameUtils
                     return (player, shortestPath);
                 }
 
-            // Define the neighboring positions
-            (int, int)[] neighbors = {
+                // Define the neighboring positions
+                (int, int)[] neighbors = {
                 (r - 1, c), (r, c - 1), (r + 1, c), (r, c + 1), (r - 1, c + 1), (r + 1, c - 1)
             };
 
-            // Check each neighboring position
-            foreach ((int x, int y) in neighbors)
-            {
-                // Ensure the position is within the matrix bounds, owned by the player, and not visited
-                if (x >= 0 && x < matrix.Length && y >= 0 && y < matrix[x].Length &&
-                    matrix[x][y].Owner == player && !visited.Contains((x, y)))
+                // Check each neighboring position
+                foreach ((int x, int y) in neighbors)
                 {
-                    // Enqueue the position and mark it as visited
-                    queue.Enqueue((x, y));
-                    visited.Add((x, y));
-                    parent[(x, y)] = (r, c); // Set the parent of the current position
+                    // Ensure the position is within the matrix bounds, owned by the player, and not visited
+                    if (x >= 0 && x < matrix.Length && y >= 0 && y < matrix[x].Length &&
+                        matrix[x][y].Owner == player && !visited.Contains((x, y)))
+                    {
+                        // Enqueue the position and mark it as visited
+                        queue.Enqueue((x, y));
+                        visited.Add((x, y));
+                        parent[(x, y)] = (r, c); // Set the parent of the current position
                     }
+                }
             }
-        }
 
             // Player 2 has not won, return 0
             return (0, new List<(int, int)>());
-    }
-    else
-    {
+        }
+        else
+        {
             // Return 0 for other players
-           return(0, new List<(int, int)>());
+            return (0, new List<(int, int)>());
+        }
     }
-}
-    
+
 }
