@@ -42,7 +42,15 @@ public class MainMenuManager : MonoBehaviour
         }
         if (val == 1)
         {
-            Player1Type = "AI";
+            Player1Type = "AI Easy";
+        }
+        if (val == 2)
+        {
+            Player1Type = "AI Medium";
+        }
+        if (val == 3)
+        {
+            Player1Type = "AI Hard";
         }
     }
 
@@ -54,7 +62,15 @@ public class MainMenuManager : MonoBehaviour
         }
         if (val == 1)
         {
-            Player2Type = "AI";
+            Player2Type = "AI Easy";
+        }
+        if (val == 2)
+        {
+            Player2Type = "AI Medium";
+        }
+        if (val == 3)
+        {
+            Player2Type = "AI Hard";
         }
     }
 
