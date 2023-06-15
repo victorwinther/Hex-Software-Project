@@ -50,6 +50,10 @@
 
     private void OnMouseDown()
     {
+
+        int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
+        int yIndex = int.Parse(gameObject.name.Split('|')[1]);
+
         Debug.Log(GameManager.notHumanTurn);
         if (GameManager.notHumanTurn == false)
         {
@@ -59,7 +63,9 @@
                 {
                     Console.WriteLine("Visited positions:");
                     Owner = GameManager.CurrentPlayer;
-                    GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
+                    GameManager.Instance.RecordMove(xIndex, yIndex);
+                    GameManager.Instance.RecordOpponentMove(xIndex, yIndex);
+
                     GameManager.Instance.SwitchPlayer();
 
                     // Update the color of the tile based on the owner
@@ -71,8 +77,7 @@
                 }
 
                 // Extract the x and y index from the GameObject's name
-                int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
-                int yIndex = int.Parse(gameObject.name.Split('|')[1]);
+
 
                 Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
@@ -91,6 +96,10 @@
                     GameManager.Instance.StopCorutine();
                     PlayerTurnText.win = true;
                     Debug.Log("Player " + winner + " wins!");
+                    GameManager.Instance.isGameOver = true;
+                    // Hide timer text
+                    GameManager.Instance.timerText.gameObject.SetActive(false);
+                    //                    GameManager.Instance.fireworks.Play();
                 }
 
                 GridManager.Instance.PrintBoardState();

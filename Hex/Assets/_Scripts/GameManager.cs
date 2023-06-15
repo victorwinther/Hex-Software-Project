@@ -4,12 +4,147 @@
     using System.Linq;
     using UnityEngine;
     using UnityEngine.SceneManagement;
+    using UnityEngine.UI;
 
 
-    public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour
     {
+    public Text timerText;
+    public bool isGameOver = false;
 
-        GameUtils gameUtils = new GameUtils();
+    //public ParticleSystem fireworks;
+
+    private List<Vector2> allMoves = new List<Vector2>();
+    public void RecordMove(int x, int y)
+    {
+        allMoves.Add(new Vector2(x, y));
+
+        Debug.Log($"Player {CurrentPlayer} moved to [{x}, {y}]");
+
+        // Debug the entire list of moves every time a move is made
+        Debug.Log("List of all moves made so far:");
+        foreach (Vector2 move in allMoves)
+        {
+            Debug.Log($"Move at [{move.x}, {move.y}]");
+        }
+    }
+
+    void Update()
+    {
+        // Check if 'u' key is pressed
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            UndoLastMove();
+        }
+
+        if (isBlitzMode)
+        {
+            if (!isGameOver) // Only update if the game is not over
+            {
+                timeLeft -= Time.deltaTime; // Decrease the time left every frame.
+                                            // Update the text field.
+                timerText.text = "Time Left: " + Mathf.Round(timeLeft).ToString();
+
+                if (timeLeft <= 0f)
+                {
+                    // Time's up. Make a random move.
+                    MakeRandomMove();
+                    // Reset the timer.
+                    timeLeft = timeForTurn;
+                    SwitchPlayer();
+                }
+            }
+        }
+    }
+
+    void UndoLastMove()
+    {
+        if (allMoves.Count > 0)
+        {
+            // Get the last move from the allMoves list
+            Vector2 lastMove = allMoves[allMoves.Count - 1];
+
+            // Convert the vector2 coordinates to integers
+            int x = (int)lastMove.x;
+            int y = (int)lastMove.y;
+
+            // Get the tile at the last move's position
+            Tile tile = GridManager.Instance.tiles[x][y];
+
+            // Reset the tile's owner and color
+            tile.Owner = 0;
+            tile.GetComponent<SpriteRenderer>().color = Color.white;
+
+            // Remove the last move from the allMoves list
+            allMoves.RemoveAt(allMoves.Count - 1);
+
+            // Switch the current player
+            GameManager.Instance.SwitchPlayer();
+
+        }
+        else
+        {
+            Debug.Log("No moves to undo");
+        }
+    }
+
+    public float timeForTurn = 5f; // Change this value as per the required turn time in seconds.
+    private float timeLeft;
+    public bool isBlitzMode = false;
+
+
+    private void MakeRandomMove()
+    {
+        // List of all available tiles
+        List<Vector2> availableTiles = new List<Vector2>();
+
+        // Iterate through all the tiles
+        for (int x = 0; x < MainMenuManager.gridSize; x++)
+        {
+            for (int y = 0; y < MainMenuManager.gridSize; y++)
+            {
+                // If this tile is not owned yet
+                if (GridManager.Instance.tiles[x][y].Owner == 0)
+                {
+                    availableTiles.Add(new Vector2(x, y));
+                }
+            }
+        }
+
+        // Pick a random available tile
+        if (availableTiles.Count > 0)
+        {
+            Vector2 chosenMove = availableTiles[UnityEngine.Random.Range(0, availableTiles.Count)];
+
+            // Make the chosen move
+            GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
+            GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
+
+            // Record the move
+            RecordMove((int)chosenMove.x, (int)chosenMove.y);
+
+            // Do not switch player here as it's not a player initiated action
+        }
+        else
+        {
+            Debug.Log("No empty tiles left!");
+        }
+    }
+
+    public void StartBlitzMode()
+    {
+        isBlitzMode = true;
+    }
+
+    // Call this method to stop the Blitz mode.
+    public void StopBlitzMode()
+    {
+        isBlitzMode = false;
+    }
+
+
+
+    GameUtils gameUtils = new GameUtils();
 
         public static GameManager Instance;
 
@@ -86,7 +221,9 @@
             {
                 StartCoroutine(AIMove());
             }
-        }
+
+        timeLeft = timeForTurn;
+    }
 
         public PlayerType GetPlayerType()
         {
@@ -194,6 +331,8 @@
 
             // Record AI's move
             aiMoves.Add(chosenMove);
+            // Adds move to the list of all moves.  
+            RecordMove((int)chosenMove.x, (int)chosenMove.y);
 
             GameUtils gameUtils = new GameUtils();
         (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
@@ -210,6 +349,9 @@
            
             PlayerTurnText.win = true;
             Tile.SetClickable();
+            isGameOver = true;
+            // Hide timer text
+            timerText.gameObject.SetActive(false);
 
         }
         else { SwitchPlayer(); }
@@ -332,7 +474,10 @@ private int GetOwnedNeighborCount(int x, int y)
         // Start is called before the first frame update
         void Start()
         {
+            StartBlitzMode();
             UpdateGameState(GameState.GenerateGrid);
+            // Initialize the timeLeft with timeForTurn at the start.
+            timeLeft = timeForTurn;
         }
         public void UpdateGameState(GameState newState)
         {
