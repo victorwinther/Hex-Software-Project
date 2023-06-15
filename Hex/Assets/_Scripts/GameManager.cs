@@ -115,32 +115,33 @@
         }
     
         private Vector2 secondMove;
-        private IEnumerator AIMove()
-        {
-            yield return new WaitForSeconds(0.5f); // wait for 1 second before AI makes move
+    private IEnumerator AIMove()
+    {
+        yield return new WaitForSeconds(0.5f); // wait for 1 second before AI makes move
 
-            //default value.
-            Vector2 chosenMove = GetRandomAvailableTile();
+        //default value.
+        Vector2 chosenMove = GetRandomAvailableTile();
         AIDifficulty aiDifficulty = CurrentPlayer == 1 ? Player1AILevel : Player2AILevel;
-       
+        allChosenMoves.Add(chosenMove);
+        foreach (Vector2 move in allChosenMoves)
+        {
+            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+        }
 
-            switch (aiDifficulty)
-            {
-                allChosenMoves.Add(chosenMove);
-                            foreach (Vector2 move in allChosenMoves)
-                            {
-                            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-                            }
-                case AIDifficulty.Easy:
-                    // For easy AI, always make a random move.
-                    chosenMove = GetRandomAvailableTile();  
-                    break;
-                case AIDifficulty.Medium:
-                    // For medium AI, try to block the opponent, then make a random move if no blocking is needed.
-                    Vector2? blockingMove = TryBlockOpponentMove();
-                    chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
-                    break;
-                case AIDifficulty.Hard:
+
+        switch (aiDifficulty)
+        {
+
+            case AIDifficulty.Easy:
+                // For easy AI, always make a random move.
+                chosenMove = GetRandomAvailableTile();
+                break;
+            case AIDifficulty.Medium:
+                // For medium AI, try to block the opponent, then make a random move if no blocking is needed.
+                Vector2? blockingMove = TryBlockOpponentMove();
+                chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
+                break;
+            case AIDifficulty.Hard:
                 // For hard AI, implement your own strategy here. This example uses the same strategy as the medium level.
                 if (MainMenuManager.gridSize == 3)
                 {
@@ -190,40 +191,45 @@
                     }
 
                 }
+
                 else
                 {
                     blockingMove = TryBlockOpponentMove();
                     chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile();
                 }
-                    break;
-                default:
-                    chosenMove = GetRandomAvailableTile();
-                    break;
-            }
-        
-            // Make the chosen move
-            GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
-            GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
+                break;
+            default:
+                chosenMove = GetRandomAvailableTile();
+                break;
+        }
 
-            // Record AI's move
-            aiMoves.Add(chosenMove);
 
-            GameUtils gameUtils = new GameUtils();
+        // Make the chosen move
+        GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
+
+        // Record AI's move
+        aiMoves.Add(chosenMove);
+
+        GameUtils gameUtils = new GameUtils();
         (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
 
         if (winner != 0)
         {
-            StartCoroutine(Tile.WinColors(path,CurrentPlayer));
+            StartCoroutine(Tile.WinColors(path, CurrentPlayer));
             PlayerTurnText.win = true;
             Tile.SetClickable();
 
         }
         else { SwitchPlayer(); }
+        Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
+    }
 
-          
-            Debug.Log($"Player {CurrentPlayer} clicked at array position [{chosenMove.x}, {chosenMove.y}]");
-            
-        }
+
+        
+
+    
+
 
     private Vector2 GetRandomAvailableTile()
     {
@@ -282,6 +288,7 @@
         return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count)];
     }
 }
+        
 
 private int GetOwnedNeighborCount(int x, int y)
 {
