@@ -2,6 +2,7 @@
     using System.Collections;
     using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
     public class Tile : MonoBehaviour
     {
@@ -85,7 +86,9 @@ using UnityEngine;
                 (int winner, List<(int, int)> path)= gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
 
                 if (winner != 0)
-                {
+            {
+                    GameManager.Instance.replayButton.SetActive(true);
+                    GameManager.Instance.traceButton.SetActive(false);
                     StartCoroutine(WinColors(path,Owner));
                     clickable = false;
                     GameManager.Instance.StopCorutine();

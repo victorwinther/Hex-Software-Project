@@ -15,6 +15,7 @@ public class right_red_line : MonoBehaviour
         line.positionCount = boardHeight*2;
         List<Vector3> points = new List<Vector3>();
 
+      
         float y = 0.25f;
         //float x = 0.9f*boardHeight + 0.81f/2 + 0.09f;
         float x = 0.45f + (boardHeight - 1) * 0.9f + 0.04f;

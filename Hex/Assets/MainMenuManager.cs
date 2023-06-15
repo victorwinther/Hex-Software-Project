@@ -29,7 +29,19 @@ public class MainMenuManager : MonoBehaviour
 
     if (int.TryParse(inputField.text, out int newGridSize))
     {
-        gridSize = newGridSize;
+           
+            
+            if (newGridSize > 20)
+            {
+                gridSize = 20;
+            } else if (newGridSize < 1)
+            {
+                gridSize = newGridSize * -1;
+            } else
+            {
+                gridSize=newGridSize;
+            }
+            
        
     }
 }

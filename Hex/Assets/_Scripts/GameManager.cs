@@ -15,7 +15,9 @@
 
         public GameState State;
         public static bool notHumanTurn = false;
-
+        public GameObject replayButton;
+        public GameObject traceButton;
+    
         public enum PlayerType { Human, AI }
         public enum AIDifficulty { Easy, Medium, Hard }
 
@@ -216,6 +218,8 @@
 
         if (winner != 0)
         {
+            replayButton.SetActive(true);
+            traceButton.SetActive(false);
             StartCoroutine(Tile.WinColors(path, CurrentPlayer));
             PlayerTurnText.win = true;
             Tile.SetClickable();

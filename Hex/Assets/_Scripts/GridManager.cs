@@ -108,14 +108,15 @@ public class GridManager : MonoBehaviour
 
         float offRoxXOffset = 0.9f;
         float yOffset = 0.77f;
-
+        int xStart = -12;
+        int yStart = -8;
         for (int x = 0; x < gridSize; x++)
         {
             for (int y = 0; y < gridSize; y++)
-            {
-                float xPos = x * offRoxXOffset + (y * offRoxXOffset) / 2;
+            { 
+                float xPos = (x+xStart) * offRoxXOffset + (y * offRoxXOffset) / 2;
                 Transform hex = Instantiate(Tile) as Transform;
-                hex.position = new Vector2(xPos, -y * yOffset);
+                hex.position = new Vector2(xPos, -(y+yStart) * yOffset);
                 hex.parent = this.transform;
                 hex.name = "Hexagon" + x + "|" + y;
                 hex.gameObject.AddComponent<BoxCollider2D>();

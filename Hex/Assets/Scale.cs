@@ -11,16 +11,6 @@ public class Scale : MonoBehaviour
         // Access the transform component of the GameObject
         Transform backgroundTransform = gameObject.transform;
 
-        if (MainMenuManager.gridSize > 30)
-        {
-            backgroundTransform.localScale = new Vector3(5f, 5f, 1f);
-        }
-        else
-        {
-            backgroundTransform.localScale = (new Vector3(1f, 1f, 1f));
-        }
-
-       
     }
 }
 
