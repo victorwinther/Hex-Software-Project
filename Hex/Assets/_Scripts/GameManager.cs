@@ -1,7 +1,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
+using System.Linq;
     using UnityEngine;
     using UnityEngine.SceneManagement;
 
@@ -28,6 +28,7 @@
 
         public static int CurrentPlayer;
         public static int playerSwitchCount = 0;
+        public (int winner, List<(int, int)> path) WinnerInfo;
 
         private void Awake()
         {
@@ -212,14 +213,14 @@
             // Record AI's move
             aiMoves.Add(chosenMove);
 
-            GameUtils gameUtils = new GameUtils();
-            (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
+     
+            WinnerInfo = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
 
-            if (winner != 0)
+            if (WinnerInfo.winner != 0)
             {
                 replayButton.SetActive(true);
                 traceButton.SetActive(false);
-                StartCoroutine(Tile.WinColors(path, CurrentPlayer));
+                StartCoroutine(Tile.WinColors(WinnerInfo.path, CurrentPlayer));
                 PlayerTurnText.win = true;
                 Tile.SetClickable();
 
@@ -428,7 +429,8 @@ public void PrintAllChosenMoves()
 
     currentMoveIndex = 0;
     placeMovesCoroutine = StartCoroutine(PlaceMovesWithDelay());
-}
+
+    }
 
 
 private IEnumerator PlaceMovesWithDelay()
@@ -449,7 +451,7 @@ private IEnumerator PlaceMovesWithDelay()
         if (aiMoveIndex < aiMoves.Count)
         {
             var aiMove = aiMoves[aiMoveIndex];
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.2f);
 
             int x = (int)aiMove.x;
             int y = (int)aiMove.y;
@@ -468,7 +470,7 @@ private IEnumerator PlaceMovesWithDelay()
         if (opponentMoveIndex < opponentMoves.Count)
         {
             var opponentMove = opponentMoves[opponentMoveIndex];
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.2f);
 
             int x = (int)opponentMove.x;
             int y = (int)opponentMove.y;
