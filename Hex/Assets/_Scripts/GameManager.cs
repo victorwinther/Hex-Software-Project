@@ -58,32 +58,35 @@
 
     void UndoLastMove()
     {
-        if (allMoves.Count > 0)
+        if (Player1Type == PlayerType.Human && Player2Type == PlayerType.Human)
         {
-            // Get the last move from the allMoves list
-            Vector2 lastMove = allMoves[allMoves.Count - 1];
+            if (allMoves.Count > 0)
+            {
+                // Get the last move from the allMoves list
+                Vector2 lastMove = allMoves[allMoves.Count - 1];
 
-            // Convert the vector2 coordinates to integers
-            int x = (int)lastMove.x;
-            int y = (int)lastMove.y;
+                // Convert the vector2 coordinates to integers
+                int x = (int)lastMove.x;
+                int y = (int)lastMove.y;
 
-            // Get the tile at the last move's position
-            Tile tile = GridManager.Instance.tiles[x][y];
+                // Get the tile at the last move's position
+                Tile tile = GridManager.Instance.tiles[x][y];
 
-            // Reset the tile's owner and color
-            tile.Owner = 0;
-            tile.GetComponent<SpriteRenderer>().color = Color.white;
+                // Reset the tile's owner and color
+                tile.Owner = 0;
+                tile.GetComponent<SpriteRenderer>().color = Color.white;
 
-            // Remove the last move from the allMoves list
-            allMoves.RemoveAt(allMoves.Count - 1);
+                // Remove the last move from the allMoves list
+                allMoves.RemoveAt(allMoves.Count - 1);
 
-            // Switch the current player
-            GameManager.Instance.SwitchPlayer();
+                // Switch the current player
+                GameManager.Instance.SwitchPlayer();
 
-        }
-        else
-        {
-            Debug.Log("No moves to undo");
+            }
+            else
+            {
+                Debug.Log("No moves to undo");
+            }
         }
     }
 
