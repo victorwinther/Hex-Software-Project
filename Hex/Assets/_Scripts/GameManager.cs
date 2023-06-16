@@ -162,8 +162,6 @@
                                 }
                                 else if (opponentMoves[0].x == 1) // Middle column
                                 {
-
-
                                     {
                                         chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
                                     }
@@ -252,13 +250,15 @@
                         int neighborCount = GetOwnedNeighborCount(x, y);
 
                         // If this tile is at the center or immediately adjacent to the center
-                        if (Math.Abs(x - centerX) <= 1 && Math.Abs(y - centerY) <= 1 && playerSwitchCount <= 2)
+                        if (Math.Abs(x - centerX) <= 1 && Math.Abs(y - centerY) <= 1 && playerSwitchCount <= 1)
+
                         {
                             priorityTiles.Add(new Vector2(x, y));
-                        }
-
+  
+                         }
+                        
                         // If this tile has only one owned neighboring tile
-                        else if (neighborCount >= 1)
+                        if (neighborCount >= 1)
                         {
                             neighborTiles.Add(new Vector2(x, y));
                         }
@@ -272,45 +272,97 @@
             }
 
             // If there are any priority tiles available, select one of those
-            if (priorityTiles.Count > 0)
+            if (priorityTiles.Count > 1)
             {
                 return priorityTiles[UnityEngine.Random.Range(0, priorityTiles.Count)];
             }
             // If there are neighbor tiles available, select one of those
-            else if (neighborTiles.Count > 0)
+
+            
+            else if (neighborTiles.Count > 1)
             {
-                return neighborTiles[UnityEngine.Random.Range(0, neighborTiles.Count)];
+            HexTileGame game = new HexTileGame(GridManager.Instance.tiles);
+            List<Hex> shortestPath = game.FindShortestPath(GameManager.CurrentPlayer);
+
+            Debug.Log("CurrentPlayer: "+CurrentPlayer);
+            string a = "";
+            foreach (Hex hex in shortestPath)
+            {
+                a+= ("Hex Position Shortest Path: (" + hex.Position.Col + ", " + hex.Position.Row + ")" + "\n");
+            }
+            Debug.Log(a);
+
+
+            string neighborTilesLog = "";
+            foreach (Vector2 vector in neighborTiles)
+            {
+                neighborTilesLog += "Vector Position Neighbor: (" + vector.x + ", " + vector.y + ")" + "\n";
+            }
+
+            Debug.Log(neighborTilesLog);
+
+
+            List<Vector2> shorestPathVector = new List<Vector2>();
+            foreach (Hex hex in shortestPath)
+            {
+                shorestPathVector.Add(new Vector2(hex.Position.Col, hex.Position.Row));
+
+            }
+
+            List<Vector2> commonVectors = neighborTiles.Intersect(shorestPathVector).ToList();
+            
+            foreach (Vector2 vector in commonVectors)
+            {
+                Debug.Log("Common Vector: (" + vector.x + ", " + vector.y + ")");
+            }
+            if (commonVectors.Count > 0)
+            {
+                return commonVectors[UnityEngine.Random.Range(0, commonVectors.Count - 1)];
+            }
+            else
+            {
+                return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count - 1)];
+            }
             }
             // If there are no priority tiles, neighbor tiles, or defensive tiles, select a random available tile
             else
             {
-                return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count)];
+                return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count-1)];
             }
         }
 
+    private int GetOwnedNeighborCount(int row, int col)
+    {
+        int count = 0;
 
-        private int GetOwnedNeighborCount(int x, int y)
+        // Define the six possible directions for hex tile neighbors
+
+        int[,] directions = new int[,]
         {
-            int count = 0;
-            int[] dx = { -1, -1, 0, 0, 1, 1 };
-            int[] dy = { -1, 0, -1, 1, 0, 1 };
+            { -1, 0 },   // Top
+            { -1, 1 },   // Top-right
+            { 0, 1 },    // Bottom-right
+            { 1, 0 },    // Bottom
+            { 1, -1 },   // Bottom-left
+            { 0, -1 }    // Top-left
+        };
 
-            for (int i = 0; i < dx.Length; i++)
+        for (int i = 0; i < 6; i++)
+        {
+            int newRow = row + directions[i, 0];
+            int newCol = col + directions[i, 1];
+
+            // Check if the neighbor position is within the board boundaries
+            if (newRow >= 0 && newRow < MainMenuManager.gridSize && newCol >= 0 && newCol < MainMenuManager.gridSize)
             {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-
-                if (nx >= 0 && nx < MainMenuManager.gridSize && ny >= 0 && ny < MainMenuManager.gridSize)
-                {
-                    if (GridManager.Instance.tiles[nx][ny].Owner == 1)
-                    {
-                        count++;
-                    }
-                }
+                if (GridManager.Instance.tiles[newRow][newCol].Owner == CurrentPlayer)
+                    count++;
             }
-
-            return count;
         }
+        Console.Write("returned neighbors");
+        return count;
+    }
+
 
         public void RecordOpponentMove(int x, int y)
         {
