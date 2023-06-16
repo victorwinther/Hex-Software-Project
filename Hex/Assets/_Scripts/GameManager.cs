@@ -18,8 +18,9 @@ using System.Linq;
         public static bool notHumanTurn = false;
         public GameObject replayButton;
         public GameObject traceButton;
+         public GameObject undoButton;
 
-        public enum PlayerType { Human, AI }
+    public enum PlayerType { Human, AI }
         public enum AIDifficulty { Easy, Medium, Hard }
 
         private PlayerType Player1Type;
@@ -57,7 +58,7 @@ using System.Linq;
         }
     }
 
-    void UndoLastMove()
+    public void UndoLastMove()
     {
         if (Player1Type == PlayerType.Human && Player2Type == PlayerType.Human)
         {
@@ -280,6 +281,7 @@ using System.Linq;
             {
                 replayButton.SetActive(true);
                 traceButton.SetActive(false);
+               
                 StartCoroutine(Tile.WinColors(WinnerInfo.path, CurrentPlayer));
                 PlayerTurnText.win = true;
                 Tile.SetClickable();

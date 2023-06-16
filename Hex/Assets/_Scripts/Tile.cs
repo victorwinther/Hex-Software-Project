@@ -91,7 +91,8 @@ using UnityEngine.UIElements;
             {
                     GameManager.Instance.replayButton.SetActive(true);
                     GameManager.Instance.traceButton.SetActive(false);
-                    StartCoroutine(WinColors(path,Owner));
+                    
+                StartCoroutine(WinColors(path,Owner));
                     clickable = false;
                     GameManager.Instance.StopCorutine();
                     PlayerTurnText.win = true;
