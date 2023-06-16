@@ -263,7 +263,7 @@
                     break;
             }
 
-
+            RecordMove((int)chosenMove.x, (int)chosenMove.y);
             // Make the chosen move
             GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
             GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
