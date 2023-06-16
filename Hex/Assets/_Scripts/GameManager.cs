@@ -9,7 +9,8 @@
     public class GameManager : MonoBehaviour
     {
 
-        GameUtils gameUtils = new GameUtils();
+    private List<Vector2> allMoves = new List<Vector2>();
+    GameUtils gameUtils = new GameUtils();
 
         public static GameManager Instance;
 
@@ -41,8 +42,64 @@
             }
         }
 
-        // Method to attempt blocking the opponent
-        private Vector2? TryBlockOpponentMove()
+    public void RecordMove(int x, int y)
+    {
+        allMoves.Add(new Vector2(x, y));
+
+        Debug.Log($"Player {CurrentPlayer} moved to [{x}, {y}]");
+
+        // Debug the entire list of moves every time a move is made
+        Debug.Log("List of all moves made so far:");
+        foreach (Vector2 move in allMoves)
+        {
+            Debug.Log($"Move at [{move.x}, {move.y}]");
+        }
+    }
+
+    void UndoLastMove()
+    {
+        if (allMoves.Count > 0)
+        {
+            // Get the last move from the allMoves list
+            Vector2 lastMove = allMoves[allMoves.Count - 1];
+
+            // Convert the vector2 coordinates to integers
+            int x = (int)lastMove.x;
+            int y = (int)lastMove.y;
+
+            // Get the tile at the last move's position
+            Tile tile = GridManager.Instance.tiles[x][y];
+
+            // Reset the tile's owner and color
+            tile.Owner = 0;
+            tile.GetComponent<SpriteRenderer>().color = Color.white;
+
+            // Remove the last move from the allMoves list
+            allMoves.RemoveAt(allMoves.Count - 1);
+
+            // Switch the current player
+            GameManager.Instance.SwitchPlayer();
+
+        }
+        else
+        {
+            Debug.Log("No moves to undo");
+        }
+    }
+
+    private void Update()
+    {
+        // Check if 'u' key is pressed
+        if (Input.GetKeyDown(KeyCode.U))
+        {
+            UndoLastMove();
+        }
+    }
+
+
+
+    // Method to attempt blocking the opponent
+    private Vector2? TryBlockOpponentMove()
         {
             int opponent = CurrentPlayer == 1 ? 2 : 1;
 
