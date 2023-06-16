@@ -126,13 +126,12 @@
             Vector2 chosenMove = GetRandomAvailableTile();
             AIDifficulty aiDifficulty = CurrentPlayer == 1 ? Player1AILevel : Player2AILevel;
             allChosenMoves.Add(chosenMove);
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-            }
+                            foreach (Vector2 move in allChosenMoves)
+                            {
+                            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+                            }
 
-
-            switch (aiDifficulty)
+            switch (AILevel)
             {
 
                 case AIDifficulty.Easy:
@@ -205,8 +204,7 @@
                     chosenMove = GetRandomAvailableTile();
                     break;
             }
-
-
+        
             // Make the chosen move
             GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner = CurrentPlayer;
             GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
@@ -312,86 +310,133 @@
             return count;
         }
 
-        public void RecordOpponentMove(int x, int y)
+public void RecordOpponentMove(int x, int y)
+{
+    if (GetPlayerType() == PlayerType.Human)
+    {
+        Vector2 newMove = new Vector2(x, y);
+        opponentMoves.Add(newMove);
+
+        // Add the new move to allChosenMoves only if it doesn't already exist
+        if (!allChosenMoves.Contains(newMove))
         {
-            if (GetPlayerType() == PlayerType.Human)
-            {
-                Vector2 newMove = new Vector2(x, y);
-                opponentMoves.Add(newMove);
-
-                // Add the new move to allChosenMoves only if it doesn't already exist
-                if (!allChosenMoves.Contains(newMove))
-                {
-                    allChosenMoves.Add(newMove);
-                }
-            }
-
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-            }
+            allChosenMoves.Add(newMove);
         }
+    }
 
-        public void PrintAllChosenMoves()
-        {
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-            }
+    foreach (Vector2 move in allChosenMoves)
+    {
+        Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+    }
+}
 
-            ResetGameState();
+public void PrintAllChosenMoves()
+{
+    foreach (Vector2 move in allChosenMoves)
+    {
+        Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+    }
 
-            StartCoroutine(PlaceMovesWithDelay());
-        }
+    ResetGameState();
 
-        private Color[] playerColors = { Color.red, Color.blue };
+    StartCoroutine(PlaceMovesWithDelay());
+}
+
+private Color[] playerColors = { Color.red, Color.blue };
 
         private IEnumerator PlaceMovesWithDelay()
         {
             int currentPlayerIndex = 0;
 
-            foreach (var move in allChosenMoves)
-            {
-                yield return new WaitForSeconds(0.5f);
+    foreach (var move in allChosenMoves)
+    {
+        yield return new WaitForSeconds(0.5f);
 
-                int x = (int)move.x;
-                int y = (int)move.y;
+        int x = (int)move.x;
+        int y = (int)move.y;
 
-                GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
-                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
+        GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
 
-                currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
-            }
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+    }
 
-            Tile.SetClickable();
-        }
+    Tile.SetClickable();
+}
 
-        /*
-        private IEnumerator PlaceMovesWithDelay()
+/*
+private IEnumerator PlaceMovesWithDelay()
+{
+    foreach (var move in allChosenMoves)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        GridManager.Instance.tiles[(int)move.x][(int)move.y].Owner = CurrentPlayer;
+        GridManager.Instance.tiles[(int)move.x][(int)move.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
+    }
+
+    Tile.SetClickable();
+}
+*/
+
+public List<Vector2> GetAllChosenMoves()
+{
+    PrintAllChosenMoves();
+    return allChosenMoves;
+}
+
+public void ResetGameState()
+{
+    // Reset the game state to the standard
+    UpdateGameState(GameState.GenerateGrid);
+}
+
+/*
+public void oneMoveAhead()
+{
+    if (!isCoroutinePaused)
+    {
+        if (placeMovesCoroutine != null)
         {
-            foreach (var move in allChosenMoves)
-            {
-                yield return new WaitForSeconds(0.5f);
-
-                GridManager.Instance.tiles[(int)move.x][(int)move.y].Owner = CurrentPlayer;
-                GridManager.Instance.tiles[(int)move.x][(int)move.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
-            }
-
-            Tile.SetClickable();
-        }
-        */
-
-        public List<Vector2> GetAllChosenMoves()
-        {
-            PrintAllChosenMoves();
-            return allChosenMoves;
+            StopCoroutine(placeMovesCoroutine);
+            placeMovesCoroutine = null;
         }
 
-        public void ResetGameState()
-        {
-            // Reset the game state to the standard
-            UpdateGameState(GameState.GenerateGrid);
-        }
+        StartCoroutine(PlaceMovesWithDelay());
+    }
+    else
+    {
+        currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+        isCoroutinePaused = false;
+        StartCoroutine(PlaceMovesWithDelay());
+    }
+}
+
+public void oneMoveBack()
+{
+    if (placeMovesCoroutine != null)
+    {
+        StopCoroutine(placeMovesCoroutine);
+        placeMovesCoroutine = null;
+    }
+
+    int lastMoveIndex = allChosenMoves.Count - 1;
+
+    if (lastMoveIndex >= 0)
+    {
+        Vector2 lastMove = allChosenMoves[lastMoveIndex];
+        int x = (int)lastMove.x;
+        int y = (int)lastMove.y;
+
+        GridManager.Instance.tiles[x][y].Owner = 0; // Reset the owner of the tile
+        GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = Color.white; // Reset the color of the tile
+
+        allChosenMoves.RemoveAt(lastMoveIndex); // Remove the last move from the list
+    }
+
+    Tile.SetClickable();
+}
+*/
 
         public void UpdatePlayerTypes()
         {
@@ -453,7 +498,7 @@
                 case GameState.GenerateGrid:
                     GridManager.Instance.CreateGrid();
                     CurrentPlayer = 1;
-                    UpdatePlayerTypes();
+                     UpdatePlayerTypes();
                     if (Player1Type == PlayerType.AI) // if Player1 is AI, make the first move
                     {
                         notHumanTurn = true;
