@@ -54,6 +54,9 @@ using UnityEngine.UIElements;
 
     private void OnMouseDown()
     {
+        // Extract the x and y index from the GameObject's name
+        int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
+        int yIndex = int.Parse(gameObject.name.Split('|')[1]);
         Debug.Log(GameManager.notHumanTurn);
         if (GameManager.notHumanTurn == false)
         {
@@ -63,6 +66,7 @@ using UnityEngine.UIElements;
                 {
                     Console.WriteLine("Visited positions:");
                     Owner = GameManager.CurrentPlayer;
+                    GameManager.Instance.RecordMove(xIndex, yIndex);
                     GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
                     GameManager.Instance.SwitchPlayer();
                     // Update the color of the tile based on the owner
@@ -76,9 +80,7 @@ using UnityEngine.UIElements;
 
             }
 
-                // Extract the x and y index from the GameObject's name
-                int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
-                int yIndex = int.Parse(gameObject.name.Split('|')[1]);
+
 
                 Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
