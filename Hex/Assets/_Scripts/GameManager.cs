@@ -364,86 +364,141 @@
     }
 
 
-        public void RecordOpponentMove(int x, int y)
+private Coroutine placeMovesCoroutine;
+private int currentMoveIndex;
+private int savedMoveIndex;
+private bool isReplayPaused = false;
+private Color[] playerColors = { Color.red, Color.blue };
+public void RecordAIMove(int x, int y)
+{
+        Vector2 newMove = new Vector2(x, y);
+        aiMoves.Add(newMove);
+
+        if (!allChosenMoves.Contains(newMove))
         {
-            if (GetPlayerType() == PlayerType.Human)
-            {
-                Vector2 newMove = new Vector2(x, y);
-                opponentMoves.Add(newMove);
-
-                // Add the new move to allChosenMoves only if it doesn't already exist
-                if (!allChosenMoves.Contains(newMove))
-                {
-                    allChosenMoves.Add(newMove);
-                }
-            }
-
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-            }
+            allChosenMoves.Add(newMove);
         }
 
-        public void PrintAllChosenMoves()
+        foreach (Vector2 move in allChosenMoves)
         {
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-            }
+            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+        }
+    }
 
-            ResetGameState();
+public void RecordOpponentMove(int x, int y)
+{       
+        Vector2 newMove = new Vector2(x, y);
+        opponentMoves.Add(newMove);
 
-            StartCoroutine(PlaceMovesWithDelay());
+        if (!allChosenMoves.Contains(newMove))
+        {
+            allChosenMoves.Add(newMove);
         }
 
-        private Color[] playerColors = { Color.red, Color.blue };
-
-        private IEnumerator PlaceMovesWithDelay()
+        foreach (Vector2 move in allChosenMoves)
         {
-            int currentPlayerIndex = 0;
-
-            foreach (var move in allChosenMoves)
-            {
-                yield return new WaitForSeconds(0.5f);
-
-                int x = (int)move.x;
-                int y = (int)move.y;
-
-                GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
-                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
-
-                currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
-            }
-
-            Tile.SetClickable();
+            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
         }
 
-        /*
-        private IEnumerator PlaceMovesWithDelay()
+}
+
+public void PauseReplay()
+{
+    if (placeMovesCoroutine != null)
+    {
+        isReplayPaused = true;
+        StopCoroutine(placeMovesCoroutine);
+        placeMovesCoroutine = null;
+    }
+}
+
+public void ResumeReplay()
+{
+    if (isReplayPaused)
+    {
+        isReplayPaused = false;
+        placeMovesCoroutine = StartCoroutine(PlaceMovesWithDelay());
+    }
+}
+
+public void PrintAllChosenMoves()
+{
+    ResetGameState();
+    StopAllCoroutines();
+
+    currentMoveIndex = 0;
+    placeMovesCoroutine = StartCoroutine(PlaceMovesWithDelay());
+}
+
+
+private IEnumerator PlaceMovesWithDelay()
+{
+    int currentPlayerIndex = 0;
+
+    allChosenMoves.Clear();
+
+    int aiMoveIndex = 0;
+    int opponentMoveIndex = 0;
+
+    while (aiMoveIndex < aiMoves.Count || opponentMoveIndex < opponentMoves.Count)
+    {
+	while (isReplayPaused)
         {
-            foreach (var move in allChosenMoves)
-            {
-                yield return new WaitForSeconds(0.5f);
-
-                GridManager.Instance.tiles[(int)move.x][(int)move.y].Owner = CurrentPlayer;
-                GridManager.Instance.tiles[(int)move.x][(int)move.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
-            }
-
-            Tile.SetClickable();
+            yield return null; 
         }
-        */
-
-        public List<Vector2> GetAllChosenMoves()
+        if (aiMoveIndex < aiMoves.Count)
         {
-            PrintAllChosenMoves();
-            return allChosenMoves;
+            var aiMove = aiMoves[aiMoveIndex];
+            yield return new WaitForSeconds(0.5f);
+
+            int x = (int)aiMove.x;
+            int y = (int)aiMove.y;
+
+            GridManager.Instance.tiles[x][y].Owner = (int)GameManager.PlayerType.AI;
+            GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
+
+            allChosenMoves.Add(aiMove);
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+
+            aiMoveIndex++;
+            currentMoveIndex++;
         }
 
-        public void ResetGameState()
+        if (opponentMoveIndex < opponentMoves.Count)
         {
-            // Reset the game state to the standard
-            UpdateGameState(GameState.GenerateGrid);
+            var opponentMove = opponentMoves[opponentMoveIndex];
+            yield return new WaitForSeconds(0.5f);
+
+            int x = (int)opponentMove.x;
+            int y = (int)opponentMove.y;
+
+            GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
+            GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
+
+            allChosenMoves.Add(opponentMove);
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+
+            opponentMoveIndex++;
+            currentMoveIndex++;
         }
+    }
+
+    placeMovesCoroutine = null;
+    Tile.SetClickable();
+}
+
+public List<Vector2> GetAllChosenMoves()
+{
+    PrintAllChosenMoves();
+    return allChosenMoves;
+}
+
+public void ResetGameState()
+{
+    UpdateGameState(GameState.GenerateGrid);
+}
 
         public void UpdatePlayerTypes()
         {
