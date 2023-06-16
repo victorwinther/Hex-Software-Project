@@ -103,6 +103,7 @@ using UnityEngine.UIElements;
         }
     public static IEnumerator WinColors(List<(int, int)> path, int Owner )
     {
+        Debug.Log("starting win pat");
         Color redColor = Color.red;
         redColor.a = 0.75f;
         Color darkRed = new Color(0.5f, 0.0f, 0.0f);

@@ -1,7 +1,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
+using System.Linq;
     using UnityEngine;
     using UnityEngine.SceneManagement;
 
@@ -29,6 +29,7 @@
 
         public static int CurrentPlayer;
         public static int playerSwitchCount = 0;
+        public (int winner, List<(int, int)> path) WinnerInfo;
 
         private void Awake()
         {
@@ -222,8 +223,6 @@
                                 }
                                 else if (opponentMoves[0].x == 1) // Middle column
                                 {
-
-
                                     {
                                         chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
                                     }
@@ -274,14 +273,14 @@
             // Record AI's move
             aiMoves.Add(chosenMove);
 
-            GameUtils gameUtils = new GameUtils();
-            (int winner, List<(int, int)> path) = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
+     
+            WinnerInfo = gameUtils.CheckWin(GridManager.Instance.tiles, CurrentPlayer);
 
-            if (winner != 0)
+            if (WinnerInfo.winner != 0)
             {
                 replayButton.SetActive(true);
                 traceButton.SetActive(false);
-                StartCoroutine(Tile.WinColors(path, CurrentPlayer));
+                StartCoroutine(Tile.WinColors(WinnerInfo.path, CurrentPlayer));
                 PlayerTurnText.win = true;
                 Tile.SetClickable();
 
@@ -312,13 +311,15 @@
                         int neighborCount = GetOwnedNeighborCount(x, y);
 
                         // If this tile is at the center or immediately adjacent to the center
-                        if (Math.Abs(x - centerX) <= 1 && Math.Abs(y - centerY) <= 1 && playerSwitchCount <= 2)
+                        if (Math.Abs(x - centerX) <= 1 && Math.Abs(y - centerY) <= 1 && playerSwitchCount <= 1)
+
                         {
                             priorityTiles.Add(new Vector2(x, y));
-                        }
-
+  
+                         }
+                        
                         // If this tile has only one owned neighboring tile
-                        else if (neighborCount >= 1)
+                        if (neighborCount >= 1)
                         {
                             neighborTiles.Add(new Vector2(x, y));
                         }
@@ -332,126 +333,234 @@
             }
 
             // If there are any priority tiles available, select one of those
-            if (priorityTiles.Count > 0)
+            if (priorityTiles.Count > 1)
             {
                 return priorityTiles[UnityEngine.Random.Range(0, priorityTiles.Count)];
             }
             // If there are neighbor tiles available, select one of those
-            else if (neighborTiles.Count > 0)
+
+            
+            else if (neighborTiles.Count > 1)
             {
-                return neighborTiles[UnityEngine.Random.Range(0, neighborTiles.Count)];
+            HexTileGame game = new HexTileGame(GridManager.Instance.tiles);
+            List<Hex> shortestPath = game.FindShortestPath(GameManager.CurrentPlayer);
+
+            Debug.Log("CurrentPlayer: "+CurrentPlayer);
+            string a = "";
+            foreach (Hex hex in shortestPath)
+            {
+                a+= ("Hex Position Shortest Path: (" + hex.Position.Col + ", " + hex.Position.Row + ")" + "\n");
+            }
+            Debug.Log(a);
+
+
+            string neighborTilesLog = "";
+            foreach (Vector2 vector in neighborTiles)
+            {
+                neighborTilesLog += "Vector Position Neighbor: (" + vector.x + ", " + vector.y + ")" + "\n";
+            }
+
+            Debug.Log(neighborTilesLog);
+
+
+            List<Vector2> shorestPathVector = new List<Vector2>();
+            foreach (Hex hex in shortestPath)
+            {
+                shorestPathVector.Add(new Vector2(hex.Position.Col, hex.Position.Row));
+
+            }
+
+            List<Vector2> commonVectors = neighborTiles.Intersect(shorestPathVector).ToList();
+            
+            foreach (Vector2 vector in commonVectors)
+            {
+                Debug.Log("Common Vector: (" + vector.x + ", " + vector.y + ")");
+            }
+            if (commonVectors.Count > 0)
+            {
+                return commonVectors[UnityEngine.Random.Range(0, commonVectors.Count - 1)];
+            }
+            else
+            {
+                return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count - 1)];
+            }
             }
             // If there are no priority tiles, neighbor tiles, or defensive tiles, select a random available tile
             else
             {
-                return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count)];
+                return availableTiles[UnityEngine.Random.Range(0, availableTiles.Count-1)];
             }
         }
 
+    private int GetOwnedNeighborCount(int row, int col)
+    {
+        int count = 0;
 
-        private int GetOwnedNeighborCount(int x, int y)
+        // Define the six possible directions for hex tile neighbors
+
+        int[,] directions = new int[,]
         {
-            int count = 0;
-            int[] dx = { -1, -1, 0, 0, 1, 1 };
-            int[] dy = { -1, 0, -1, 1, 0, 1 };
+            { -1, 0 },   // Top
+            { -1, 1 },   // Top-right
+            { 0, 1 },    // Bottom-right
+            { 1, 0 },    // Bottom
+            { 1, -1 },   // Bottom-left
+            { 0, -1 }    // Top-left
+        };
 
-            for (int i = 0; i < dx.Length; i++)
+        for (int i = 0; i < 6; i++)
+        {
+            int newRow = row + directions[i, 0];
+            int newCol = col + directions[i, 1];
+
+            // Check if the neighbor position is within the board boundaries
+            if (newRow >= 0 && newRow < MainMenuManager.gridSize && newCol >= 0 && newCol < MainMenuManager.gridSize)
             {
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-
-                if (nx >= 0 && nx < MainMenuManager.gridSize && ny >= 0 && ny < MainMenuManager.gridSize)
-                {
-                    if (GridManager.Instance.tiles[nx][ny].Owner == 1)
-                    {
-                        count++;
-                    }
-                }
-            }
-
-            return count;
-        }
-
-        public void RecordOpponentMove(int x, int y)
-        {
-            if (GetPlayerType() == PlayerType.Human)
-            {
-                Vector2 newMove = new Vector2(x, y);
-                opponentMoves.Add(newMove);
-
-                // Add the new move to allChosenMoves only if it doesn't already exist
-                if (!allChosenMoves.Contains(newMove))
-                {
-                    allChosenMoves.Add(newMove);
-                }
-            }
-
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+                if (GridManager.Instance.tiles[newRow][newCol].Owner == CurrentPlayer)
+                    count++;
             }
         }
+        Console.Write("returned neighbors");
+        return count;
+    }
 
-        public void PrintAllChosenMoves()
+
+private Coroutine placeMovesCoroutine;
+private int currentMoveIndex;
+private int savedMoveIndex;
+private bool isReplayPaused = false;
+private Color[] playerColors = { Color.red, Color.blue };
+public void RecordAIMove(int x, int y)
+{
+        Vector2 newMove = new Vector2(x, y);
+        aiMoves.Add(newMove);
+
+        if (!allChosenMoves.Contains(newMove))
         {
-            foreach (Vector2 move in allChosenMoves)
-            {
-                Debug.Log($"Chosen move: [{move.x}, {move.y}]");
-            }
-
-            ResetGameState();
-
-            StartCoroutine(PlaceMovesWithDelay());
+            allChosenMoves.Add(newMove);
         }
 
-        private Color[] playerColors = { Color.red, Color.blue };
-
-        private IEnumerator PlaceMovesWithDelay()
+        foreach (Vector2 move in allChosenMoves)
         {
-            int currentPlayerIndex = 0;
+            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
+        }
+    }
 
-            foreach (var move in allChosenMoves)
-            {
-                yield return new WaitForSeconds(0.5f);
+public void RecordOpponentMove(int x, int y)
+{       
+        Vector2 newMove = new Vector2(x, y);
+        opponentMoves.Add(newMove);
 
-                int x = (int)move.x;
-                int y = (int)move.y;
-
-                GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
-                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
-
-                currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
-            }
-
-            Tile.SetClickable();
+        if (!allChosenMoves.Contains(newMove))
+        {
+            allChosenMoves.Add(newMove);
         }
 
-        /*
-        private IEnumerator PlaceMovesWithDelay()
+        foreach (Vector2 move in allChosenMoves)
         {
-            foreach (var move in allChosenMoves)
-            {
-                yield return new WaitForSeconds(0.5f);
-
-                GridManager.Instance.tiles[(int)move.x][(int)move.y].Owner = CurrentPlayer;
-                GridManager.Instance.tiles[(int)move.x][(int)move.y].GetComponent<SpriteRenderer>().color = CurrentPlayer == 1 ? Color.red : Color.blue;
-            }
-
-            Tile.SetClickable();
-        }
-        */
-
-        public List<Vector2> GetAllChosenMoves()
-        {
-            PrintAllChosenMoves();
-            return allChosenMoves;
+            Debug.Log($"Chosen move: [{move.x}, {move.y}]");
         }
 
-        public void ResetGameState()
+}
+
+public void PauseReplay()
+{
+    if (placeMovesCoroutine != null)
+    {
+        isReplayPaused = true;
+        StopCoroutine(placeMovesCoroutine);
+        placeMovesCoroutine = null;
+    }
+}
+
+public void ResumeReplay()
+{
+    if (isReplayPaused)
+    {
+        isReplayPaused = false;
+        placeMovesCoroutine = StartCoroutine(PlaceMovesWithDelay());
+    }
+}
+
+public void PrintAllChosenMoves()
+{
+    ResetGameState();
+    StopAllCoroutines();
+
+    currentMoveIndex = 0;
+    placeMovesCoroutine = StartCoroutine(PlaceMovesWithDelay());
+
+    }
+
+
+private IEnumerator PlaceMovesWithDelay()
+{
+    int currentPlayerIndex = 0;
+
+    allChosenMoves.Clear();
+
+    int aiMoveIndex = 0;
+    int opponentMoveIndex = 0;
+
+    while (aiMoveIndex < aiMoves.Count || opponentMoveIndex < opponentMoves.Count)
+    {
+	while (isReplayPaused)
         {
-            // Reset the game state to the standard
-            UpdateGameState(GameState.GenerateGrid);
+            yield return null; 
         }
+        if (aiMoveIndex < aiMoves.Count)
+        {
+            var aiMove = aiMoves[aiMoveIndex];
+            yield return new WaitForSeconds(0.2f);
+
+            int x = (int)aiMove.x;
+            int y = (int)aiMove.y;
+
+            GridManager.Instance.tiles[x][y].Owner = (int)GameManager.PlayerType.AI;
+            GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
+
+            allChosenMoves.Add(aiMove);
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+
+            aiMoveIndex++;
+            currentMoveIndex++;
+        }
+
+        if (opponentMoveIndex < opponentMoves.Count)
+        {
+            var opponentMove = opponentMoves[opponentMoveIndex];
+            yield return new WaitForSeconds(0.2f);
+
+            int x = (int)opponentMove.x;
+            int y = (int)opponentMove.y;
+
+            GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
+            GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
+
+            allChosenMoves.Add(opponentMove);
+
+            currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+
+            opponentMoveIndex++;
+            currentMoveIndex++;
+        }
+    }
+
+    placeMovesCoroutine = null;
+    Tile.SetClickable();
+}
+
+public List<Vector2> GetAllChosenMoves()
+{
+    PrintAllChosenMoves();
+    return allChosenMoves;
+}
+
+public void ResetGameState()
+{
+    UpdateGameState(GameState.GenerateGrid);
+}
 
         public void UpdatePlayerTypes()
         {
