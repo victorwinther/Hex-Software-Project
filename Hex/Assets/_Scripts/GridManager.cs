@@ -48,18 +48,7 @@ public class GridManager : MonoBehaviour
         if (!isHighlighted)
         {
             shortestPath = game.FindShortestPath(GameManager.CurrentPlayer);
-            Debug.Log("Shortest Path in tile");
-            string s = "";
-            foreach (Hex hex in shortestPath)
-            {
-                s += ($"Position: ({hex.Position.Row}, {hex.Position.Col}), Value: {hex.Value}");
-                s += "\n";
-            }
-            Debug.Log(s);
-            // Print the path
-            //Console.WriteLine("Shortest Path:");
-
-
+            
             if (GameManager.CurrentPlayer == 2)
             {
                 newColor = ColorUtility.TryParseHtmlString("#00A8FF", out Color convertedColor) ? convertedColor : Color.magenta;

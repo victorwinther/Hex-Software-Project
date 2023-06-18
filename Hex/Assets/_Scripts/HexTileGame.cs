@@ -135,31 +135,7 @@ public class HexTileGame
         }
 
 
-        // Print the distances
-        Debug.Log("Distances:");
-        string s = "";
-        for (int row = 0; row < numRows; row++)
-        {
-            for (int col = 0; col < numCols; col++)
-            {
-                s+=($"Position: ({row}, {col}), Distance: {distances[row, col]}");
-                s += "\n";
-            }
-        }
-        Debug.Log(s);
-
-        string a = "";
-
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                a += (board[i][j].Owner + " ");
-            }
-            a += ("\n");
-        }
-        Debug.Log(a);
-
+       
         return path1;
 
         
@@ -256,7 +232,7 @@ public class HexTileGame
                 return 1;
             }
         }
-        Debug.Log("Current and neighbor value: " + currentValue + " " + neighborValue);
+      
         // All other moves have infinite weight
          return double.PositiveInfinity;
     }

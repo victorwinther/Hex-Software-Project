@@ -57,14 +57,13 @@ using UnityEngine.UIElements;
         // Extract the x and y index from the GameObject's name
         int xIndex = int.Parse(gameObject.name.Split('|')[0].Substring(7));
         int yIndex = int.Parse(gameObject.name.Split('|')[1]);
-        Debug.Log(GameManager.notHumanTurn);
         if (GameManager.notHumanTurn == false)
         {
             if (clickable)
             {
                 if (Owner == 0)
                 {
-                    Console.WriteLine("Visited positions:");
+                    
                     Owner = GameManager.CurrentPlayer;
                     GameManager.Instance.RecordMove(xIndex, yIndex);
                     GameManager.Instance.RecordOpponentMove(int.Parse(gameObject.name.Split('|')[0].Substring(7)), int.Parse(gameObject.name.Split('|')[1]));
@@ -79,7 +78,6 @@ using UnityEngine.UIElements;
                 }
 
             }
-                Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
                 GameUtils gameUtils = new GameUtils();
                 (int winner, List<(int, int)> path)= gameUtils.CheckWin(GridManager.Instance.tiles, Owner);
@@ -102,7 +100,6 @@ using UnityEngine.UIElements;
         }
     public static IEnumerator WinColors(List<(int, int)> path, int Owner )
     {
-        Debug.Log("starting win pat");
         Color redColor = Color.red;
         redColor.a = 0.75f;
         Color darkRed = new Color(0.5f, 0.0f, 0.0f);
@@ -110,14 +107,6 @@ using UnityEngine.UIElements;
         //Color blueColor = Color.darkBlue;
         Color darkBlue = new Color(0.0f, 0.0f, 0.5f);
         //blueColor.a = 0.75f;
-
-        Debug.Log("Shortest path:");
-        foreach ((int x, int y) in path)
-        {
-            GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = Color.white;
-            Debug.Log($"({x}, {y})");
-
-        }
         yield return new WaitForSeconds(1.0f);
         foreach ((int x, int y) in path)
         {
