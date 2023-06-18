@@ -215,9 +215,14 @@ public class GameManager : MonoBehaviour
                             {
                                 chosenMove = GridManager.Instance.tiles[0][1].Owner == 0 ? new Vector2(0, 1) : new Vector2(0, 2);
                             }
-                            else // opponentMoves[0].y == 2 left column
+                            else if (opponentMoves[0].x == 0) // opponentMoves[0].y == 2 left column
                             {
                                 chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
+                            }
+                            else
+                            {
+                                if (secondMove.x == 0) { chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1); }
+                                else { chosenMove = GridManager.Instance.tiles[0][1].Owner == 0 ? new Vector2(0, 1) : new Vector2(0, 2); }
                             }
                         }
 
