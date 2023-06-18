@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 
@@ -19,6 +20,8 @@ public class GameManager : MonoBehaviour
     public GameObject replayButton;
     public GameObject traceButton;
     public GameObject undoButton;
+    public Image hexPrefab;
+    private SpriteRenderer spriteRenderer;
 
     public enum PlayerType { Human, AI }
     public enum AIDifficulty { Easy, Medium, Hard }
@@ -42,6 +45,12 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Update()
+    {
+        
+        hexPrefab.color = CurrentPlayer == 1 ? Color.red : Color.blue;
     }
 
     public void RecordMove(int x, int y)
@@ -215,9 +224,14 @@ public class GameManager : MonoBehaviour
                             {
                                 chosenMove = GridManager.Instance.tiles[0][1].Owner == 0 ? new Vector2(0, 1) : new Vector2(0, 2);
                             }
-                            else // opponentMoves[0].y == 2 left column
+                            else if (opponentMoves[0].x == 0) // opponentMoves[0].y == 2 left column
                             {
                                 chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1);
+                            }
+                            else
+                            {
+                                if (secondMove.x == 0) { chosenMove = GridManager.Instance.tiles[2][0].Owner == 0 ? new Vector2(2, 0) : new Vector2(2, 1); }
+                                else { chosenMove = GridManager.Instance.tiles[0][1].Owner == 0 ? new Vector2(0, 1) : new Vector2(0, 2); }
                             }
                         }
 
