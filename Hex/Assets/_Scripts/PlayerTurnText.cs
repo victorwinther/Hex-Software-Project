@@ -5,6 +5,7 @@ public class PlayerTurnText : MonoBehaviour
 {
     public static TMP_Text playerTurnText;
     public static bool win = false;
+    public static int player;
     private void Start()
     {
     playerTurnText = GetComponent<TMP_Text>();
@@ -23,7 +24,7 @@ public class PlayerTurnText : MonoBehaviour
         {
            // playerTurnText.fontSize = 75;
           //  playerTurnText.fontStyle = FontStyles.Bold;
-            if(currentPlayer == 2) { playerTurnText.text = player1Name + " Won"; } else { playerTurnText.text = player2Name + " Won"; } 
+            if(player == 1) { playerTurnText.text = player1Name + " Won"; } else { playerTurnText.text = player2Name + " Won"; } 
          
             
         }

@@ -99,15 +99,12 @@ public class GridManager : MonoBehaviour
 
     public void CreateGrid()
     {
-
         int gridSize = MainMenuManager.gridSize;
-
         tiles = new Tile[gridSize][];
         for (int i = 0; i < gridSize; i++)
         {
             tiles[i] = new Tile[gridSize];
         }
-
         float offRoxXOffset = 0.9f;
         float yOffset = 0.77f;
         int xStart = -12;
@@ -129,7 +126,6 @@ public class GridManager : MonoBehaviour
             }
         }
     }
-
     public Tile GetTileAtPostion(Vector2 pos)
     {
         int x = (int)pos.x;
@@ -141,7 +137,6 @@ public class GridManager : MonoBehaviour
         }
         return null;
     }
-
     public void PrintBoardState()
     {
         string boardState = "";

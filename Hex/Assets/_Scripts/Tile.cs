@@ -79,9 +79,6 @@ using UnityEngine.UIElements;
                 }
 
             }
-
-
-
                 Debug.Log($"Player {Owner} clicked at array position [{xIndex}, {yIndex}]");
 
                 GameUtils gameUtils = new GameUtils();
@@ -92,10 +89,11 @@ using UnityEngine.UIElements;
                     GameManager.Instance.replayButton.SetActive(true);
                     GameManager.Instance.traceButton.SetActive(false);
                     
-                StartCoroutine(WinColors(path,Owner));
+                    StartCoroutine(WinColors(path,Owner));
                     clickable = false;
                     GameManager.Instance.StopCorutine();
                     PlayerTurnText.win = true;
+                    PlayerTurnText.player = winner;
                     Debug.Log("Player " + winner + " wins!");
                 }
 

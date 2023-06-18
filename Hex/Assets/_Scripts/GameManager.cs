@@ -2,7 +2,7 @@
     using System.Collections;
     using System.Collections.Generic;
 using System.Linq;
-    using UnityEngine;
+using UnityEngine;
     using UnityEngine.SceneManagement;
 
 
@@ -279,9 +279,9 @@ using System.Linq;
 
             if (WinnerInfo.winner != 0)
             {
+                PlayerTurnText.player = WinnerInfo.winner;
                 replayButton.SetActive(true);
                 traceButton.SetActive(false);
-               
                 StartCoroutine(Tile.WinColors(WinnerInfo.path, CurrentPlayer));
                 PlayerTurnText.win = true;
                 Tile.SetClickable();
