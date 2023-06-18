@@ -492,11 +492,27 @@ public class GameManager : MonoBehaviour
                 int y = (int)aiMove.y;
 
                 GridManager.Instance.tiles[x][y].Owner = (int)GameManager.PlayerType.AI;
+                Color currentColor = playerColors[currentPlayerIndex];
+                Color darkerColor = new Color(
+                currentColor.r * 0.75f,  
+                currentColor.g * 0.75f,  
+                currentColor.b * 0.75f,  
+                currentColor.a          
+                );
+                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = darkerColor;
+
+                allChosenMoves.Add(aiMove);
+
+                currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+
+                /*
+                GridManager.Instance.tiles[x][y].Owner = (int)GameManager.PlayerType.AI;
                 GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
 
                 allChosenMoves.Add(aiMove);
 
                 currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+                */
 
                 aiMoveIndex++;
                 currentMoveIndex++;
@@ -511,11 +527,27 @@ public class GameManager : MonoBehaviour
                 int y = (int)opponentMove.y;
 
                 GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
+                Color currentColor = playerColors[currentPlayerIndex];
+                Color darkerColor = new Color(
+                currentColor.r * 0.75f,  
+                currentColor.g * 0.75f,  
+                currentColor.b * 0.75f,  
+                currentColor.a        
+                );
+                GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = darkerColor;
+
+                allChosenMoves.Add(opponentMove);
+
+                currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+
+                /*
+                GridManager.Instance.tiles[x][y].Owner = CurrentPlayer;
                 GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = playerColors[currentPlayerIndex];
 
                 allChosenMoves.Add(opponentMove);
 
                 currentPlayerIndex = (currentPlayerIndex + 1) % playerColors.Length;
+                */
 
                 opponentMoveIndex++;
                 currentMoveIndex++;
