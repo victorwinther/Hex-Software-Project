@@ -103,10 +103,13 @@ using UnityEngine.UIElements;
         Color redColor = Color.red;
         redColor.a = 0.75f;
         Color darkRed = new Color(0.5f, 0.0f, 0.0f);
-
-        //Color blueColor = Color.darkBlue;
         Color darkBlue = new Color(0.0f, 0.0f, 0.5f);
-        //blueColor.a = 0.75f;
+       
+        foreach ((int x, int y) in path)
+        {
+            GridManager.Instance.tiles[x][y].GetComponent<SpriteRenderer>().color = Color.white;
+            
+        }
         yield return new WaitForSeconds(1.0f);
         foreach ((int x, int y) in path)
         {

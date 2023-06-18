@@ -22,11 +22,8 @@ public class PlayerTurnText : MonoBehaviour
         string player2Name = PlayerPrefs.GetString("Player2Name", "Player 2");
         if (win)
         {
-           // playerTurnText.fontSize = 75;
-          //  playerTurnText.fontStyle = FontStyles.Bold;
             if(player == 1) { playerTurnText.text = player1Name + " Won"; } else { playerTurnText.text = player2Name + " Won"; } 
-         
-            
+
         }
         else
         {

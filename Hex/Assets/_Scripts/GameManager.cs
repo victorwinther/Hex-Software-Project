@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour
     public GameObject undoButton;
     public Image hexPrefab;
     private SpriteRenderer spriteRenderer;
-
     public enum PlayerType { Human, AI }
     public enum AIDifficulty { Easy, Medium, Hard }
 
@@ -49,7 +48,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        
         hexPrefab.color = CurrentPlayer == 1 ? Color.red : Color.blue;
     }
 
@@ -646,6 +644,10 @@ public class GameManager : MonoBehaviour
                 UpdatePlayerTypes();
                 if (Player1Type == PlayerType.AI) // if Player1 is AI, make the first move
                 {
+                    if(Player1Type == PlayerType.AI && Player2Type == PlayerType.AI)
+                    {
+                        Tile.clickable = false;
+                    } 
                     notHumanTurn = true;
                     StartCoroutine(AIMove());
                 }

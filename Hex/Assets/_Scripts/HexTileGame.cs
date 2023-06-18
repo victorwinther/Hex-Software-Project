@@ -99,7 +99,6 @@ public class HexTileGame
             // Check if we reached the top row
             if ((current.Row == 0 && player == 2) || (current.Col == (numCols-1) && player == 1))
             {
-                Console.Write(distances[current.Row, current.Col] + " distance from buttom");
                 if (distances[current.Row, current.Col] < minValue)
                 {
                     minValue = distances[current.Row, current.Col];
@@ -171,7 +170,6 @@ public class HexTileGame
               neighbors.Add(new Position(newRow, newCol));
             }
         }
-        Console.Write("returned neighbors");
         return neighbors;
     }
 
@@ -183,19 +181,19 @@ public class HexTileGame
         {
             if (currentValue == 2 && neighborValue == 2)
             {
-                Console.Write("Same");
+               
                 // Both blue when weight is 0
                 return 0;
             }
             else if (currentValue == 0 && neighborValue == 2)
             {
-                Console.Write("Correct move");
+               
                 // Blue player can move to unoccupied tile
                 return 0;
             }
             else if (currentValue == 2 && neighborValue == 0)
             {
-                Console.Write("Correct move");
+              
                 // Blue player can move to unoccupied tile
                 return 1;
             }
@@ -210,19 +208,19 @@ public class HexTileGame
         {
             if (currentValue == 1 && neighborValue == 1)
             {
-                Console.Write("Same");
+            
                 // Both blue when weight is 0
                 return 0;
             }
             else if (currentValue == 0 && neighborValue == 1)
             {
-                Console.Write("Correct move");
+               
                 // Blue player can move to unoccupied tile
                 return 0;
             }
             else if (currentValue == 1 && neighborValue == 0)
             {
-                Console.Write("Correct move");
+                
                 // Blue player can move to unoccupied tile
                 return 1;
             }
