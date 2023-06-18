@@ -95,15 +95,12 @@ public class HexTileGame
         while (!queue.IsEmpty())
         {
             Position current = queue.Dequeue();
-
-            // Check if we reached the top row
             if ((current.Row == 0 && player == 2) || (current.Col == (numCols-1) && player == 1))
             {
                 if (distances[current.Row, current.Col] < minValue)
                 {
                     minValue = distances[current.Row, current.Col];
                     path1.Clear();
-                    // Reconstruct the path from top to bottom
                     Position currentPosition = current;
                     while (currentPosition != null)
                     {
@@ -112,7 +109,7 @@ public class HexTileGame
                         currentPosition = previousPositions[currentPosition.Row, currentPosition.Col];
                     }
 
-                    path1.Reverse();  // Reverse the path to start from the top row
+                    path1.Reverse();
                 }
             }
 
@@ -132,12 +129,8 @@ public class HexTileGame
                 }
             }
         }
-
-
-       
         return path1;
 
-        
     }
 
     private List<Position> GetNeighbors(Position position)

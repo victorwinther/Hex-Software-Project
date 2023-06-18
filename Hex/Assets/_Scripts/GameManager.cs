@@ -49,6 +49,11 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
         hexPrefab.color = CurrentPlayer == 1 ? Color.red : Color.blue;
+
+        if(Player1Type == PlayerType.AI || Player2Type == PlayerType.AI)
+        {
+            undoButton.SetActive(false);
+        }
     }
 
     public void RecordMove(int x, int y)
@@ -236,7 +241,9 @@ public class GameManager : MonoBehaviour
                         // If the chosen tile is not available, switch to the default random strategy
                         if (GridManager.Instance.tiles[(int)chosenMove.x][(int)chosenMove.y].Owner != 0)
                         {
-                            chosenMove = GetRandomAvailableTile(true);
+                            blockingMove = TryBlockOpponentMove();
+                            chosenMove = blockingMove.HasValue ? blockingMove.Value : GetRandomAvailableTile(true);
+                            
                         }
                     }
 
@@ -418,7 +425,7 @@ public class GameManager : MonoBehaviour
                     count++;
             }
         }
-        Console.Write("returned neighbors");
+      
         return count;
     }
 
@@ -498,7 +505,7 @@ public class GameManager : MonoBehaviour
             if (aiMoveIndex < aiMoves.Count)
             {
                 var aiMove = aiMoves[aiMoveIndex];
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.5f);
 
                 int x = (int)aiMove.x;
                 int y = (int)aiMove.y;
@@ -533,7 +540,7 @@ public class GameManager : MonoBehaviour
             if (opponentMoveIndex < opponentMoves.Count)
             {
                 var opponentMove = opponentMoves[opponentMoveIndex];
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.5f);
 
                 int x = (int)opponentMove.x;
                 int y = (int)opponentMove.y;

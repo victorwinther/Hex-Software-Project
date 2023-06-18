@@ -1,6 +1,6 @@
 using UnityEngine;
 using TMPro;
-
+using System;
 public class PlayerTurnText : MonoBehaviour
 {
     public static TMP_Text playerTurnText;
@@ -29,11 +29,12 @@ public class PlayerTurnText : MonoBehaviour
         {
             if (currentPlayer == 1)
             {
-                playerTurnText.text = player1Name + "'s Turn";
+             
+                playerTurnText.text = player1Name.Substring(0, Math.Min(player1Name.Length, 15)) + "'s Turn";
             }
             else if (currentPlayer == 2)
             {
-                playerTurnText.text = player2Name + "'s Turn";
+                playerTurnText.text = player2Name.Substring(0, Math.Min(player2Name.Length, 15)) + "'s Turn";
             }
         }
         }
