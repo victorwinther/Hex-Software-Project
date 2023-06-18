@@ -18,7 +18,7 @@ using UnityEngine;
         public static bool notHumanTurn = false;
         public GameObject replayButton;
         public GameObject traceButton;
-         public GameObject undoButton;
+        public GameObject undoButton;
 
     public enum PlayerType { Human, AI }
         public enum AIDifficulty { Easy, Medium, Hard }
@@ -282,6 +282,7 @@ using UnityEngine;
                 PlayerTurnText.player = WinnerInfo.winner;
                 replayButton.SetActive(true);
                 traceButton.SetActive(false);
+                undoButton.SetActive(false);
                 StartCoroutine(Tile.WinColors(WinnerInfo.path, CurrentPlayer));
                 PlayerTurnText.win = true;
                 Tile.SetClickable();
@@ -354,7 +355,6 @@ using UnityEngine;
                 a+= ("Hex Position Shortest Path: (" + hex.Position.Col + ", " + hex.Position.Row + ")" + "\n");
             }
             Debug.Log(a);
-
 
             string neighborTilesLog = "";
             foreach (Vector2 vector in neighborTiles)
