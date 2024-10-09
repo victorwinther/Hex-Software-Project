@@ -1,2 +1,2 @@
 # Hex
-Game developed in Unity featuring algorithms designed for optimal winning strategies and computer opponents.
+Game developed in Unity featuring algorithms such as DFS coded in C# designed for optimal winning strategies and computer opponents.
